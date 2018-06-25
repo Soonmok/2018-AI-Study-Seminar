@@ -3,7 +3,7 @@
 This repository is for 2018-AI-Study-Seminar in MyongJi University to share study resources and codes.
 
 # Overview
-This project follows studying Reinforcement Learning with other open source project.
+This project focus on studying Reinforcement Learning with other open source project.
 
 ## 1. DQN for Flappy Bird game
 https://github.com/yenchenlin/DeepLearningFlappyBird
@@ -16,14 +16,6 @@ https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 This repository includes korean comments to help understand a Self Driving car project
 
 ## 3. Several study resources to share
-
-
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-
 
 
 # 2018-AI-Study-Seminar
