@@ -5,7 +5,7 @@ This repository is for 2018-AI-Study-Seminar in MyongJi University to share stud
 # Overview
 This project focus on studying Reinforcement Learning with other open source project.
 
-## 1. Learn by others code
+## Learn by others code
 This directory includes some famous and fun RL project with korean comments 
 
 ### 1. DQN for Flappy Bird game
@@ -18,7 +18,7 @@ https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 This repository includes korean comments to help understand a Self Driving car project
 
-## 2. Several study resources to share
+## Several study resources to share
 
 This repository includes resources to study reinforcement learning 
 
@@ -29,7 +29,7 @@ This repository includes resources to study reinforcement learning
 # Overview
 이 프로젝트는 여러 강화학습 프로젝트들에 집중하고 있으며 관련 프로젝트 코드를 올리고 공유하면서 공부하는 공간입니다.
 
-## 1. Learn by others code
+## Learn by others code
 이 폴더에서는 깃허브에서 공유되는 유명한 강화학습 관련 프로젝트 코드를 한국어 주석과 같이 제공합니다.
 
 ### 1. DQN for Flappy Bird game
@@ -42,6 +42,6 @@ https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이터와 위의 프로젝트를 분석하고 한글로 된 주석을 제공합니다.
 
-## 2. Several study resources to share
+## Several study resources to share
 
 강화학습을 학습하기 위한 공부 자료들을 공유하는 공간입니다.
