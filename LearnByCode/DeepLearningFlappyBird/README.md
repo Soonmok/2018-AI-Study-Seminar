@@ -5,7 +5,7 @@
 7 mins version: [DQN for flappy bird](https://www.youtube.com/watch?v=THhUXIhjkCM)
 
 ## Overview
-This project follows the description of the Deep Q Learning algorithm described in Playing Atari with Deep Reinforcement Learning [2] and shows that this learning algorithm can be further generalized to the notorious Flappy Bird.
+이 프로젝트는 딥 마인드의 강화학습을 이용한 아타리 게임 플레이하기 프로젝트의 알고리즘을 따와서 flappy bird 라는 게임에 적용시킨 프로젝트입니다.
 
 ## Installation Dependencies:
 * Python 2.7 or 3
@@ -13,23 +13,22 @@ This project follows the description of the Deep Q Learning algorithm described 
 * pygame
 * OpenCV-Python
 
-## How to Run?
+사용하기 쉽도록 docker image를 만들어 곧 베포할 예정
+
+## 실행 방법
 ```
-git clone https://github.com/yenchenlin1994/DeepLearningFlappyBird.git
 cd DeepLearningFlappyBird
 python deep_q_network.py
 ```
 
 ## What is Deep Q-Network?
-It is a convolutional neural network, trained with a variant of Q-learning, whose input is raw pixels and whose output is a value function estimating future rewards.
+DQN(Deep Q Network)란?
 
-For those who are interested in deep reinforcement learning, I highly recommend to read the following post:
-
-[Demystifying Deep Reinforcement Learning](http://www.nervanasys.com/demystifying-deep-reinforcement-learning/)
+convolution neural network와 q learning 을 이용하여 cnn으로 픽셀데이터를 읽고 특징을 읽고 q-learning으로 value function (강화학습을 시키기 위해 보상체계)를 구현하는 것
 
 ## Deep Q-Network Algorithm
 
-The pseudo-code for the Deep Q Learning algorithm, as given in [1], can be found below:
+pseudo-code
 
 ```
 Initialize replay memory D to size N
@@ -53,63 +52,30 @@ end for
 ## Experiments
 
 #### Environment
-Since deep Q-network is trained on the raw pixel values observed from the game screen at each time step, [3] finds that remove the background appeared in the original game can make it converge faster. This process can be visualized as the following figure:
+
+q network가 읽어온 픽셀을 기반으로 학습을 하기 때문에 불필요한 배경 정보는 빼도록 아래와 같이 게임 환경을 바꿈
 
 <img src="./images/preprocess.png" width="450">
 
 #### Network Architecture
-According to [1], I first preprocessed the game screens with following steps:
+학습에 필요한 이미지 데이터를 처리하는 과정
 
-1. Convert image to grayscale
-2. Resize image to 80x80
-3. Stack last 4 frames to produce an 80x80x4 input array for network
+1. 이미지를 흑백으로 바꾼다.
+2. 이미지를 80 * 80 크기로 재설정한다.
+3. 4개의 frame들을 쌓아서 80 * 80 * 4의 형태를 갖춘 배열을 만들고 이 배열을 인풋데이터로 사용한다.
 
-The architecture of the network is shown in the figure below. The first layer convolves the input image with an 8x8x4x32 kernel at a stride size of 4. The output is then put through a 2x2 max pooling layer. The second layer convolves with a 4x4x32x64 kernel at a stride of 2. We then max pool again. The third layer convolves with a 3x3x64x64 kernel at a stride of 1. We then max pool one more time. The last hidden layer consists of 256 fully connected ReLU nodes.
+아래 그림에 자세한 아키텍처가 설명되어 있습니다.
+간단히 말하자면 앞서 말한 input 데이터에 convolution과 maxpooling 을 총 3번 시키고 아웃풋을 0 과 1 (점프를 뛴다 = 1 , 점프를 뛰지 않는다 = 0) 으로 나오도록 한다. 
+
 
 <img src="./images/network.png">
 
-The final output layer has the same dimensionality as the number of valid actions which can be performed in the game, where the 0th index always corresponds to doing nothing. The values at this output layer represent the Q function given the input state for each valid action. At each time step, the network performs whichever action corresponds to the highest Q value using a ϵ greedy policy.
+각각의 timestep마다 학습하는 모델은 더 높은 q value값을 얻기위해 노력하면서 학습한다.
 
-
-#### Training
-At first, I initialize all weight matrices randomly using a normal distribution with a standard deviation of 0.01, then set the replay memory with a max size of 500,00 experiences.
-
-I start training by choosing actions uniformly at random for the first 10,000 time steps, without updating the network weights. This allows the system to populate the replay memory before training begins.
-
-Note that unlike [1], which initialize ϵ = 1, I linearly anneal ϵ from 0.1 to 0.0001 over the course of the next 3000,000 frames. The reason why I set it this way is that agent can choose an action every 0.03s (FPS=30) in our game, high ϵ will make it **flap** too much and thus keeps itself at the top of the game screen and finally bump the pipe in a clumsy way. This condition will make Q function converge relatively slow since it only start to look other conditions when ϵ is low.
-However, in other games, initialize ϵ to 1 is more reasonable.
-
-During training time, at each time step, the network samples minibatches of size 32 from the replay memory to train on, and performs a gradient step on the loss function described above using the Adam optimization algorithm with a learning rate of 0.000001. After annealing finishes, the network continues to train indefinitely, with ϵ fixed at 0.001.
-
-## FAQ
-
-#### Checkpoint not found
-Change [first line of `saved_networks/checkpoint`](https://github.com/yenchenlin1994/DeepLearningFlappyBird/blob/master/saved_networks/checkpoint#L1) to 
-
-`model_checkpoint_path: "saved_networks/bird-dqn-2920000"`
-
-#### How to reproduce?
-1. Comment out [these lines](https://github.com/yenchenlin1994/DeepLearningFlappyBird/blob/master/deep_q_network.py#L108-L112)
-
-2. Modify `deep_q_network.py`'s parameter as follow:
-```python
-OBSERVE = 10000
-EXPLORE = 3000000
-FINAL_EPSILON = 0.0001
-INITIAL_EPSILON = 0.1
-```
-
-## References
-
-[1] Mnih Volodymyr, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and Demis Hassabis. **Human-level Control through Deep Reinforcement Learning**. Nature, 529-33, 2015.
-
-[2] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. **Playing Atari with Deep Reinforcement Learning**. NIPS, Deep Learning workshop
-
-[3] Kevin Chen. **Deep Reinforcement Learning for Flappy Bird** [Report](http://cs229.stanford.edu/proj2015/362_report.pdf) | [Youtube result](https://youtu.be/9WKBzTUsPKc)
 
 ## Disclaimer
-This work is highly based on the following repos:
+이 프로젝트는 아래에 있는 깃허브 프로젝트를 따온 것입니다.
 
-1. [sourabhv/FlapPyBird] (https://github.com/sourabhv/FlapPyBird)
-2. [asrivat1/DeepLearningVideoGames](https://github.com/asrivat1/DeepLearningVideoGames)
+1. (https://github.com/yenchenlin/DeepLearningFlappyBird)
+
 
