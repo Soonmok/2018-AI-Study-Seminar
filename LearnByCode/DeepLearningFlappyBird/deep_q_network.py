@@ -1,82 +1,114 @@
 #!/usr/bin/env python
 from __future__ import print_function
-
+# 학습을 위한 툴인 텐서플로우를 불러옵니다
 import tensorflow as tf
+
+# 게임 이미지데이터를 처리하기 위한 opencv 라이브러리 입니다.
 import cv2
+
+# 파일 경로 접근을 위한 sys라이브러리
 import sys
 sys.path.append("game/")
+
+#게임 폴더를 불러옵니다.
 import wrapped_flappy_bird as game
 import random
 import numpy as np
 from collections import deque
 
-GAME = 'bird' # the name of the game being played for log files
-ACTIONS = 2 # number of valid actions
-GAMMA = 0.99 # decay rate of past observations
+GAME = 'bird' # 게임 이름
+ACTIONS = 2 # 유효한 액션 수 (뛰기, 그대로 있기)
+GAMMA = 0.99 # decay rate (강화학습에 있는 개념)
 OBSERVE = 100000. # timesteps to observe before training
 EXPLORE = 2000000. # frames over which to anneal epsilon
-FINAL_EPSILON = 0.0001 # final value of epsilon
-INITIAL_EPSILON = 0.0001 # starting value of epsilon
-REPLAY_MEMORY = 50000 # number of previous transitions to remember
-BATCH = 32 # size of minibatch
+FINAL_EPSILON = 0.0001 # 마지막 epsilon 값
+INITIAL_EPSILON = 0.0001 # 초기 epsilon 값
+REPLAY_MEMORY = 50000 # 이전 행동을 기억하는 메모리 크기(행동 갯수)
+BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
 
 def weight_variable(shape):
+    """가중치 값 초기화"""
     initial = tf.truncated_normal(shape, stddev = 0.01)
     return tf.Variable(initial)
 
 def bias_variable(shape):
+    """bias 값 초기화"""
     initial = tf.constant(0.01, shape = shape)
     return tf.Variable(initial)
 
 def conv2d(x, W, stride):
+    """convolution 하는 함수
+    x = 인풋데이터, W = 가중치, stride = window가 한번 움직일때 움직이는 정도"""
     return tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = "SAME")
 
 def max_pool_2x2(x):
+    """max pooling하는 함수
+    x = conv2d함수에 의해 convolve 된 값"""
     return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = "SAME")
 
 def createNetwork():
-    # network weights
+    """네트워크 각각에 해당되는 가중치(w)와 bias 값들에 대한 초기화를 한번에 해주는 함수
+    총 3개의 convolution 네트워크를 가지고 있는 네트워크이다 """
+
+    #첫번째 convolution 레이어에 필요한 w와 bias 생성
     W_conv1 = weight_variable([8, 8, 4, 32])
     b_conv1 = bias_variable([32])
 
+    #두번째 convolution 레이어에 필요한 w와 bias 생성
     W_conv2 = weight_variable([4, 4, 32, 64])
     b_conv2 = bias_variable([64])
 
+    #세번째 convolution 레이어에 필요한 w와 bias 생성
     W_conv3 = weight_variable([3, 3, 64, 64])
     b_conv3 = bias_variable([64])
 
+    #첫번째 fully connect 레이어에 필요한 w와 bias 생성
     W_fc1 = weight_variable([1600, 512])
     b_fc1 = bias_variable([512])
 
+    #두번째 fully connect 레이어에 필요한 w와 bias 생성
+    """ 이 레이어는 가장 말단이며 Flappy bird가 날지 가만히 있을지를 알려준다"""
     W_fc2 = weight_variable([512, ACTIONS])
     b_fc2 = bias_variable([ACTIONS])
 
-    # input layer
+    #데이터를 받는 변수
+    """ 80 * 80 크기의 사진데이터를 4개씩 NONE개 만큼 담는 placeholder 변수
+	NONE표시는 몇개인지 정해지지 않았을때 쓴다"""
     s = tf.placeholder("float", [None, 80, 80, 4])
 
-    # hidden layers
+    # 히든 레이어 생성
+    """ 인풋데이터 s를 conv2d함수로 convolve시키고 Wx + b 형태의 모델로 표현한뒤 
+    relu activation시킨다"""
     h_conv1 = tf.nn.relu(conv2d(s, W_conv1, 4) + b_conv1)
+    """ relu activation 시킨 값들을 max pooling 시키고 같은 형태의 모델로 표현한뒤 relu"""
     h_pool1 = max_pool_2x2(h_conv1)
 
+    """ 위에 레이어에서 처리된 데이터를 또다시 convolve 시키고 같은 형태의 모델로 표현한뒤 relu"""
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
-    #h_pool2 = max_pool_2x2(h_conv2)
 
+    """ 위에 레이어에서 처리된 데이터를 또다시 convolve 시키고 같은 형태의 모델로 표현한뒤 relu"""
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
-    #h_pool3 = max_pool_2x2(h_conv3)
 
-    #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
+    """ 처리된 데이터의 shape를 1열로 쭉 나열한다""" 
     h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
 
+    """ 나열된 데이터에 다시한번 Wx + b 모델에 넣고 relu activation"""
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
-    # readout layer
+    # 새의 행동을 결정하는 레이어 
+    """ 똑같이 Wx + b 모델에 넣고 출력값을 통해 날지 안날지 결정"""
     readout = tf.matmul(h_fc1, W_fc2) + b_fc2
+
+    """ s = 데이터, readout = 뛸지 안뛸지 결정하도록 하는 데이터 값(아직 activation값임), 
+    h_fc1 = readout 레이어를 통과하기 전 데이터"""
 
     return s, readout, h_fc1
 
 def trainNetwork(s, readout, h_fc1, sess):
-    # define the cost function
+    """ 위에서 만든 레이어 들을 본격적으로 학습시키는 함수"""
+
+    # cost 함수 설정
     a = tf.placeholder("float", [None, ACTIONS])
     y = tf.placeholder("float", [None])
     readout_action = tf.reduce_sum(tf.multiply(readout, a), reduction_indices=1)
