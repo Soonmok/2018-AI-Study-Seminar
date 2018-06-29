@@ -46,7 +46,7 @@ Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이�
 
 강화학습을 학습하기 위한 공부 자료들을 공유하는 공간입니다.
 
-### 1. 골빈해커의 3분 딥러닝 텐서플로맛(https://github.com/golbin/TensorFlow-Tutorials)     
+### [1. 골빈해커의 3분 딥러닝 텐서플로맛](https://github.com/golbin/TensorFlow-Tutorials)     
   
   
   `git clone https://github.com/golbin/TensorFlow-Tutorials.git`
