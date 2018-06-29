@@ -8,12 +8,12 @@ This project focus on studying Reinforcement Learning with other open source pro
 ## Learn by others code
 This directory includes some famous and fun RL project with korean comments 
 
-### 1. DQN for Flappy Bird game
+### [1. DQN for Flappy Bird game] (https://github.com/yenchenlin/DeepLearningFlappyBird)
 https://github.com/yenchenlin/DeepLearningFlappyBird
 
 This repository includes korean comments to help understand DQN flappy bird project
 
-### 2. DQN for a Self Driving car
+### 2. [DQN for a Self Driving car] (https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
 https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 This repository includes korean comments to help understand a Self Driving car project
@@ -45,3 +45,9 @@ Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이�
 ## Several study resources to share
 
 강화학습을 학습하기 위한 공부 자료들을 공유하는 공간입니다.
+
+### 1. 골빈해커의 3분 딥러닝 텐서플로맛   
+  [레포지토리](https://github.com/golbin/TensorFlow-Tutorials)  
+  
+  'git clone https://github.com/golbin/TensorFlow-Tutorials.git'    
+  
