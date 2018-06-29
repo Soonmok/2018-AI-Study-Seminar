@@ -8,12 +8,12 @@ This project focus on studying Reinforcement Learning with other open source pro
 ## Learn by others code
 This directory includes some famous and fun RL project with korean comments 
 
-### [1. DQN for Flappy Bird game] (https://github.com/yenchenlin/DeepLearningFlappyBird)
+### [1. DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
 https://github.com/yenchenlin/DeepLearningFlappyBird
 
 This repository includes korean comments to help understand DQN flappy bird project
 
-### 2. [DQN for a Self Driving car] (https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
+### 2. [DQN for a Self Driving car](https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
 https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 This repository includes korean comments to help understand a Self Driving car project
@@ -32,12 +32,12 @@ This repository includes resources to study reinforcement learning
 ## Learn by others code
 이 폴더에서는 깃허브에서 공유되는 유명한 강화학습 관련 프로젝트 코드를 한국어 주석과 같이 제공합니다.
 
-### 1. DQN for Flappy Bird game
+### [1. DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
 https://github.com/yenchenlin/DeepLearningFlappyBird
 
 강화학습을 게임에 적용한 DeepLearningFlappyBird 코드를 분석하고 한글로 된 주석을 제공합니다.
 
-### 2. DQN for a Self Driving car
+### [2. DQN for a Self Driving car](https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
 https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이터와 위의 프로젝트를 분석하고 한글로 된 주석을 제공합니다.
