@@ -49,5 +49,8 @@ Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이�
 ### [1. 골빈해커의 3분 딥러닝 텐서플로맛](https://github.com/golbin/TensorFlow-Tutorials)     
   
   
-  `git clone https://github.com/golbin/TensorFlow-Tutorials.git`
+  `git clone https://github.com/golbin/TensorFlow-Tutorials.git`  
   
+### 2. 쿠키런 AI  
+
+>[SlideShare](https://www.slideshare.net/deview/ai-67608549)
