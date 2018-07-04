@@ -54,3 +54,10 @@ Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이�
 ### 2. 쿠키런 AI  
 
 >[SlideShare](https://www.slideshare.net/deview/ai-67608549)
+
+### [3. 파이썬과 케라스로 배우는 강화학습](http://wikibook.co.kr/reinforcement-learning/)  
+
+>[Code](https://github.com/rlcode/reinforcement-learning-kr)  
+> 'git clone https://github.com/rlcode/reinforcement-learning-kr'  
+
+
