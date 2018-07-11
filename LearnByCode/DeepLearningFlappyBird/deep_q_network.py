@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+'''
+Code Flow
+1. main()
+2. playGame()
+3. CreateNetwork()
+    1. s
+    2. readout
+    3. h_fc1
+'''
 from __future__ import print_function
 # 학습을 위한 툴인 텐서플로우를 불러옵니다
 import tensorflow as tf
@@ -21,14 +30,17 @@ ACTIONS = 2 # 유효한 액션 수 (뛰기, 그대로 있기)
 GAMMA = 0.99 # decay rate (강화학습에 있는 개념)
 OBSERVE = 100000. # timesteps to observe before training
 EXPLORE = 2000000. # frames over which to anneal epsilon
-FINAL_EPSILON = 0.0001 # 마지막 epsilon 값
+FINAL_EPSILON = 0.0001 # 마지막 epsilon 값 epsilon은 랜덤 확률을 하는 변수 입니다.
 INITIAL_EPSILON = 0.0001 # 초기 epsilon 값
 REPLAY_MEMORY = 50000 # 이전 행동을 기억하는 메모리 크기(행동 갯수)
 BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
 
+# 신경망을 만들고 초기화 하는 메소드
 def weight_variable(shape):
     """가중치 값 초기화"""
+
+    #  1차원 Tensor이고,  표준편차가 0.01인 정규분포 난수를 추출
     initial = tf.truncated_normal(shape, stddev = 0.01)
     return tf.Variable(initial)
 
