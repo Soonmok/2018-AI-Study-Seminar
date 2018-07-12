@@ -33,10 +33,14 @@ class GameState:
     def __init__(self):
         self.score = self.playerIndex = self.loopIter = 0
         self.playerx = int(SCREENWIDTH * 0.2)
-        self.playery = int((SCREENHEIGHT - PLAYER_HEIGHT) / 2)
+        self.playery = int((SCREENHEIGHT - PLAYER_HEIGHT) / 2) # ??
+        
         self.basex = 0
         self.baseShift = IMAGES['base'].get_width() - BACKGROUND_WIDTH
-
+        
+        """ [0][x], [0][y] -> upper pipe Pos
+            [1][x], [1][y] -> lower pipe Pos
+        """
         newPipe1 = getRandomPipe()
         newPipe2 = getRandomPipe()
         self.upperPipes = [
@@ -58,6 +62,7 @@ class GameState:
         self.playerFlapped = False # True when player flaps
 
     def frame_step(self, input_actions):
+        # internally process pygame event handlers
         pygame.event.pump()
 
         reward = 0.1
@@ -69,12 +74,14 @@ class GameState:
         # input_actions[0] == 1: do nothing
         # input_actions[1] == 1: flap the bird
         if input_actions[1] == 1:
+            # ???
             if self.playery > -2 * PLAYER_HEIGHT:
                 self.playerVelY = self.playerFlapAcc
                 self.playerFlapped = True
                 #SOUNDS['wing'].play()
 
         # check for score
+        # check player successed flapping pipes.
         playerMidPos = self.playerx + PLAYER_WIDTH / 2
         for pipe in self.upperPipes:
             pipeMidPos = pipe['x'] + PIPE_WIDTH / 2

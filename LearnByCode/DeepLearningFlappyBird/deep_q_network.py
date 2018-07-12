@@ -1,12 +1,25 @@
 #!/usr/bin/env python
 '''
+2018/07/11 요약 -> tf.shape는 정확한 함수가 아님. 
 Code Flow
+=====Starting deep_q_network=====
 1. main()
 2. playGame()
 3. CreateNetwork()
-    1. s
-    2. readout
-    3. h_fc1
+  s = InitialInputData
+  readout = [Last Input,ACTIONS]=[2,2], 행동 결정 행렬
+  h_fc1 = ? 
+4. trainNetwork(s, readout, h_fc1, sess)
+    =====Starting Wrapped_flappy_bird=====
+        =====Starting flappy_bird_utils=====
+        1. load() 
+        2. getHitmask(image)
+        =====End flappy_bird_utils=====
+        IMAGES -> all Sprites of Images (Dict(tuple))
+        HITMASK -> all value of images hitmask (Dict(tuple))
+    1. __init__
+    2. frame_step(do_nothing)
+
 '''
 from __future__ import print_function
 # 학습을 위한 툴인 텐서플로우를 불러옵니다
@@ -19,7 +32,7 @@ import cv2
 import sys
 sys.path.append("game/")
 
-#게임 폴더를 불러옵니다.
+#게임과 통신을 할 변수 game.
 import wrapped_flappy_bird as game
 import random
 import numpy as np
@@ -36,19 +49,24 @@ REPLAY_MEMORY = 50000 # 이전 행동을 기억하는 메모리 크기(행동 �
 BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
 
-# 신경망을 만들고 초기화 하는 메소드
+#신경망을 만들고 초기화 하는 메소드
+# shape : 신경망의 구조
 def weight_variable(shape):
     """가중치 값 초기화"""
 
-    #  1차원 Tensor이고,  표준편차가 0.01인 정규분포 난수를 추출
+    # Shape의 크기를 가지고,  표준편차가 0.01인 정규분포 난수를 추출
     initial = tf.truncated_normal(shape, stddev = 0.01)
     return tf.Variable(initial)
 
+# bias를 만들고 값을 0.01로 초기화
 def bias_variable(shape):
     """bias 값 초기화"""
     initial = tf.constant(0.01, shape = shape)
     return tf.Variable(initial)
 
+# x = inputData, 
+# W = weight
+# stride = stride
 def conv2d(x, W, stride):
     """convolution 하는 함수
     x = 인풋데이터, W = 가중치, stride = window가 한번 움직일때 움직이는 정도"""
@@ -92,27 +110,39 @@ def createNetwork():
     # 히든 레이어 생성
     """ 인풋데이터 s를 conv2d함수로 convolve시키고 Wx + b 형태의 모델로 표현한뒤 
     relu activation시킨다"""
+
+    # s = input, w_conv1 = weight, 4 = stride
     h_conv1 = tf.nn.relu(conv2d(s, W_conv1, 4) + b_conv1)
     """ relu activation 시킨 값들을 max pooling 시키고 같은 형태의 모델로 표현한뒤 relu"""
     h_pool1 = max_pool_2x2(h_conv1)
 
     """ 위에 레이어에서 처리된 데이터를 또다시 convolve 시키고 같은 형태의 모델로 표현한뒤 relu"""
+    # 2 = stride
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
 
-    """ 위에 레이어에서 처리된 데이터를 또다시 convolve 시키고 같은 형태의 모델로 표현한뒤 relu"""
+    """ 위에 레이어에서 처리된 데이터를 또다시 convolve 시키고 같은 형태의 모델로 표현한뒤 relu
+        shape(h_conv3) -> (4,None) [4, 800]
+    """
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
 
-    """ 처리된 데이터의 shape를 1열로 쭉 나열한다""" 
+
+    """ 처리된 데이터의 shape를 1열로 쭉 나열한다
+        shape(h_conv3_flat) -> (2,None)
+        h_conv3_flat = [2,1600]
+    """
     h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
-
+   
     """ 나열된 데이터에 다시한번 Wx + b 모델에 넣고 relu activation"""
+    # h_fc1 [2,None] , [2,512]
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
-
     # 새의 행동을 결정하는 레이어 
+    # readout = [2,None] / [2, ACTIONS]
     """ 똑같이 Wx + b 모델에 넣고 출력값을 통해 날지 안날지 결정"""
-    readout = tf.matmul(h_fc1, W_fc2) + b_fc2
 
-    """ s = 데이터, readout = 뛸지 안뛸지 결정하도록 하는 데이터 값(아직 activation값임), 
+    readout = tf.matmul(h_fc1, W_fc2) + b_fc2
+    
+
+    """ s = 입력 데이터, readout = 뛸지 안뛸지 결정하도록 하는 데이터 값(아직 activation값임), 
     h_fc1 = readout 레이어를 통과하기 전 데이터"""
 
     return s, readout, h_fc1
@@ -123,14 +153,21 @@ def trainNetwork(s, readout, h_fc1, sess):
     # cost 함수 설정
     a = tf.placeholder("float", [None, ACTIONS])
     y = tf.placeholder("float", [None])
+
+    # reduction_indices == axis,
+    # multiply -> every action has Q-Value. 
+    # 1 -> 행들의 합을 하나의 원소로, 
+    # 0 -> 열들의 합을 하나의 원소로 바꾸는 옵션
     readout_action = tf.reduce_sum(tf.multiply(readout, a), reduction_indices=1)
+
+    # MSE 오류함수를 Make and Optimize
     cost = tf.reduce_mean(tf.square(y - readout_action))
     train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
 
     # open up a game state to communicate with emulator
     game_state = game.GameState()
 
-    # store the previous observations in replay memory
+    # store? the previous observations in replay memory
     D = deque()
 
     # printing
