@@ -81,7 +81,7 @@ class GameState:
                 #SOUNDS['wing'].play()
 
         # check for score
-        # check player successed flapping pipes.
+        # 플레이어가 Pipe 를 넘었으면 reward 를 1로 바꾼다.
         playerMidPos = self.playerx + PLAYER_WIDTH / 2
         for pipe in self.upperPipes:
             pipeMidPos = pipe['x'] + PIPE_WIDTH / 2

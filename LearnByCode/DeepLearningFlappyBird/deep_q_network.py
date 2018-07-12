@@ -19,7 +19,10 @@ Code Flow
         HITMASK -> all value of images hitmask (Dict(tuple))
     1. __init__
     2. frame_step(do_nothing)
-
+    =====End Wrapped_flappy_bird=====
+     x_t -> image data (3차원 배열로 이루어진 화면 픽셀 데이터)
+     r_0 -> reward (파이프를 정상적으로 넘었다면 1, 아니면 0.1 )
+     terminal -> terminal (파이프와 충돌했다면 True, 아니면 False)
 '''
 from __future__ import print_function
 # 학습을 위한 툴인 텐서플로우를 불러옵니다
@@ -180,6 +183,8 @@ def trainNetwork(s, readout, h_fc1, sess):
     x_t, r_0, terminal = game_state.frame_step(do_nothing)
     x_t = cv2.cvtColor(cv2.resize(x_t, (80, 80)), cv2.COLOR_BGR2GRAY)
     ret, x_t = cv2.threshold(x_t,1,255,cv2.THRESH_BINARY)
+
+    # s_t State(t)
     s_t = np.stack((x_t, x_t, x_t, x_t), axis=2)
 
     # saving and loading networks
@@ -197,7 +202,11 @@ def trainNetwork(s, readout, h_fc1, sess):
     t = 0
     while "flappy bird" != "angry bird":
         # choose an action epsilon greedily
+        # eval == sess.run()
         readout_t = readout.eval(feed_dict={s : [s_t]})[0]
+
+        # Frame 마다 epsilon 값을 비교해서 Random Action 혹은 Max Q함수를 골라 a_t[index] = 1 로 초기화 한다.
+        # a_t << [0] == 1: do nothing  [1] == 1:Flapp
         a_t = np.zeros([ACTIONS])
         action_index = 0
         if t % FRAME_PER_ACTION == 0:
@@ -217,7 +226,7 @@ def trainNetwork(s, readout, h_fc1, sess):
 
         # run the selected action and observe next state and reward
         x_t1_colored, r_t, terminal = game_state.frame_step(a_t)
-        x_t1 = cv2.cvtColor(cv2.resize(x_t1_colored, (80, 80)), cv2.COLOR_BGR2GRAY)
+        x_t1 = cv2.cvtColor(cv2.resize(x_t1_colored, (80, 80)), cv2.COLOR_BGR2GRAY) 
         ret, x_t1 = cv2.threshold(x_t1, 1, 255, cv2.THRESH_BINARY)
         x_t1 = np.reshape(x_t1, (80, 80, 1))
         #s_t1 = np.append(x_t1, s_t[:,:,1:], axis = 2)
