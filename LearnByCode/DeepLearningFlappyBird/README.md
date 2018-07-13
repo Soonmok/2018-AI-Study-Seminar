@@ -63,11 +63,12 @@ end for
             `IMAGES, SOUNDS, HITMASKS = flappy_bird_utils.load()`  
                 =====Starting flappy_bird_utils=====  
                 1. `load()` // 스프라이트에서 필요한 파일들을 Load  
-                    `getHitmask(image)`  // 이미지를 Hitmasking해서 튜플로 변경  
+                    - `getHitmask(image)`  // 이미지를 Hitmasking해서 튜플로 변경  
                 =====End flappy_bird_utils=====  
             - IMAGES -> 모든 스프라이트들의 이미지들을 가지고 있는 Dict (Dict(tuple))  
             - HITMASK -> 모든 스프라이트들의 이미지를 HitMasking 시켜서 tuple 형태로 존재  
                 2. `__init__`  // 스프라이트들의 속성 값들을 설정  
+                  
         =====End Wrapped_flappy_bird=====  
         2. `x_t, r_0, terminal = game_state.frame_step(input_actions)` // 액션들을 주고 프레임을 진행 함에 따라 파이프 관리, Reward 와 같은 환경 요소를 관리한다  
             x_t -> image data (3차원 배열로 이루어진 화면 픽셀 데이터)  
