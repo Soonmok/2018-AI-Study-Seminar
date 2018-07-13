@@ -4,23 +4,17 @@ import tensorflow as tf
 ACTIONS = 2
 
 def weight_variable(shape):
-    """가중치 값 초기화"""
     initial = tf.truncated_normal(shape, stddev = 0.01)
     return tf.Variable(initial)
 
 def bias_variable(shape):
-    """bias 값 초기화"""
     initial = tf.constant(0.01, shape = shape)
     return tf.Variable(initial)
 
 def conv2d(x, W, stride):
-    """convolution 하는 함수
-    x = 인풋데이터, W = 가중치, stride = window가 한번 움직일때 움직이는 정도"""
     return tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = "SAME")
 
 def max_pool_2x2(x):
-    """max pooling하는 함수
-    x = conv2d함수에 의해 convolve 된 값"""
     return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = "SAME")
 
 def create_cnn_layer(data, weight, bias, stride):
@@ -37,8 +31,6 @@ def create_fc_layer(data, weight, bias):
 
 
 def createNetwork():
-    """네트워크 각각에 해당되는 가중치(w)와 bias 값들에 대한 초기화를 한번에 해주는 함수
-    총 3개의 convolution 네트워크를 가지고 있는 네트워크이다 """
     
     data = tf.placeholder("float", [None, 80, 80, 4])
 
@@ -56,4 +48,4 @@ def createNetwork():
 
     readout = create_fc_layer(h_fc1, weight=[512, ACTIONS], bias=[ACTIONS])
 
-    return data, readout, h_fc1
+    return data, readout, h_fc1, h_conv1, h_pool1, h_conv2, h_conv3, h_conv3_flat
