@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 '''
-2018/07/11 요약 -> tf.shape는 정확한 함수가 아님. 
 Code Flow
 =====Starting deep_q_network=====
 1. main()
 2. playGame()
 3. CreateNetwork()
   s = InitialInputData
-  readout = [Last Input,ACTIONS]=[2,2], 행동 결정 행렬
+  readout = [Last Input,ACTIONS]=[Input,2], 행동 결정 행렬
   h_fc1 = ? 
 4. trainNetwork(s, readout, h_fc1, sess)
     =====Starting Wrapped_flappy_bird=====

@@ -85,7 +85,7 @@ def load():
 
     return IMAGES, SOUNDS, HITMASKS
 
-# 이미지를 마스킹 시켜서 불투명도가 있으면 True, 없으면 0으로 바꾸어서 되돌려 주는 함수
+# 이미지를 마스킹 시켜서 투명도가 0이 아니면 True, 0이면 False으로 바꾸어서 되돌려 주는 함수
 def getHitmask(image):
     """returns a hitmask using an image's alpha.(alpha means opacity)"""
     mask = []
