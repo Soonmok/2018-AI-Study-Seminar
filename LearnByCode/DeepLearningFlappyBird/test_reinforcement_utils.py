@@ -17,6 +17,7 @@ def test_act_with_greed_policy():
     for i in range(5):
         epsilon = 1.0
         readout = [random.randrange(100) for _ in range(2)]
+        assert (np.sum(action) == 1)
 
 if __name__ == "__main__":
     test_act_with_greed_policy()
