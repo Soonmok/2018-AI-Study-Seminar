@@ -1,5 +1,11 @@
 import pygame
 import sys
+'''
+covert_alpha() in StackOverflow
+convert surfaces to the same pixel format as used by the screen. 
+This ensures that you won't lose performance because of conversions 
+when you're blitting them to the screen. 
+'''
 def load():
     # path of player with different states
     PLAYER_PATH = (
@@ -36,6 +42,14 @@ def load():
     # sounds
     if 'win' in sys.platform:
         soundExt = '.wav'
+    else:
+        soundExt = '.ogg'
+
+   # SOUNDS['die']    = pygame.mixer.Sound('assets/audio/die' + soundExt)
+   # SOUNDS['hit']    = pygame.mixer.Sound('assets/audio/hit' + soundExt)
+   # SOUNDS['point']  = pygame.mixer.Sound('assets/audio/point' + soundExt)
+   # SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
+   # SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
     # select random background sprites
     IMAGES['background'] = pygame.image.load(BACKGROUND_PATH).convert()
@@ -48,13 +62,15 @@ def load():
     )
 
     # select random pipe sprites
+    # IMAGES['pipe'][0] -> Upper Pipe
+    # IMAGES['pipe'][1] -> Lower Pipe
     IMAGES['pipe'] = (
         pygame.transform.rotate(
             pygame.image.load(PIPE_PATH).convert_alpha(), 180),
         pygame.image.load(PIPE_PATH).convert_alpha(),
     )
 
-    # hismask for pipes
+    # hitmask for pipes
     HITMASKS['pipe'] = (
         getHitmask(IMAGES['pipe'][0]),
         getHitmask(IMAGES['pipe'][1]),
@@ -69,11 +85,14 @@ def load():
 
     return IMAGES, SOUNDS, HITMASKS
 
+# 이미지를 마스킹 시켜서 투명도가 0이 아니면 True, 0이면 False으로 바꾸어서 되돌려 주는 함수
 def getHitmask(image):
-    """returns a hitmask using an image's alpha."""
+    """returns a hitmask using an image's alpha.(alpha means opacity)"""
     mask = []
     for x in range(image.get_width()):
         mask.append([])
         for y in range(image.get_height()):
+            # get_at((x,y))[3] returns opacity of pixel (RGBA Tuple)
+            # bool(get_at((x,y))[3]) returns False if there is no Color.
             mask[x].append(bool(image.get_at((x,y))[3]))
     return mask
