@@ -17,24 +17,12 @@ def act_with_greedy_policy(epsilon, readout_t, action):
                     [0] : stay, [1] : Jump
                 를 가르키고 있으며, 둘 중 하나는 항상 1(True)을 가지고 있어야 한다.
 
-<<<<<<< HEAD
         함수에 대한 정보
         1. random.random() -> 0~1 사이의 실수 값을 랜덤하게 되돌려 준다.
             random.randrange(MAX) -> 0 ~ MAX-1 사이의 정수 값을 랜덤하게 되돌려 준다.
         2. np.argmax(list) -> list에서 가장 높은 값을 가지는 index를 되돌려 준다.
     """
     if random.random() < epsilon :
-||||||| merged common ancestors
-    """ epsilon 확률로 랜덤하게 행동"""
-    if random.random() <= epsilon:
-=======
-        함수에 대한 정보
-        1. random.random() -> 0~1 사이의 실수 값을 랜덤하게 되돌려 준다.
-            random.random(MAX) -> 0 ~ MAX-1 사이의 정수 값을 랜덤하게 되돌려 준다.
-        2. np.argmax(list) -> list에서 가장 높은 값을 가지는 index를 되돌려 준다.
-    """
-    if random.random() < epsilon :
->>>>>>> upstream/master
         print("----------Random Action----------")
         action_index = random.randrange(2)
         action[random.randrange(2)] = 1
