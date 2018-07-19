@@ -70,7 +70,7 @@ def trainNetwork(s, readout, h_fc1, sess):
         # epsilon greedy 구현
 
         readout_t = readout.eval(feed_dict={s : [s_t]})[0]
-
+        print(readout_t)
         a_t = np.zeros([ACTIONS])
         action_index = 0
 
