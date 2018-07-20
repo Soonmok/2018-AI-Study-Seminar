@@ -2,6 +2,7 @@ from reinforcement_utils import act_with_greedy_policy
 import numpy as np
 import random as random
 
+"""
 def test_act_with_greed_policy():
     for i in range(10):
         epsilon = -1.0
@@ -21,3 +22,4 @@ def test_act_with_greed_policy():
 
 if __name__ == "__main__":
     test_act_with_greed_policy()
+"""

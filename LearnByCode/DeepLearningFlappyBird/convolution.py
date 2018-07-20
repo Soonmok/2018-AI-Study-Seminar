@@ -15,11 +15,9 @@ def weight_variable(shape):
     # ... 을 채우시오
     # hint 
     # tensorflow 에서 제공하는 tf.truncated_normal를 통해 랜덤 변수값(initial)을 생성할것
-    """
-    initial = ...
+    # 분산 값(stddev)은 1.0 으로 한다
+    initial = tf.truncated_normal(shape, stddev=1.0)
     return tf.Variable(initial)
-    """
-    return
 
 def bias_variable(shape):
     """ 
@@ -32,11 +30,10 @@ def bias_variable(shape):
 
     # ... 을 채우시오
     # tensorflow 에서 제공하는 tf.truncated_normal를 통해 랜덤 변수값(initial)을 생성할것
-    """
-    initial = ...
+    # 분산 값(stddev)은 1.0 으로 한다
+
+    initial = tf.truncated_normal(shape, stddev=1.0)
     return tf.Variable(initial)
-    """
-    return
 
 def conv2d(x, W, stride):
     """
@@ -46,7 +43,7 @@ def conv2d(x, W, stride):
 
         인풋 데이터 == x,
         레이어의 weight(가중치) == w
-        stride == convolution layer에 쓰이는 stride의 가로, 세로 길이(정사각형)
+        stride == convolution layer에 쓰이는 stride의 가로, 세로 범위
         
     """
     # ...을 채우시오
@@ -54,7 +51,6 @@ def conv2d(x, W, stride):
     """
     return ...
     """
-    return 
 
 def max_pool_2x2(x):
     """
@@ -71,7 +67,6 @@ def max_pool_2x2(x):
     """
     return ...
     """
-    return
 
 def create_cnn_layer(data, weight, bias, stride):
     """
@@ -82,7 +77,7 @@ def create_cnn_layer(data, weight, bias, stride):
         data = 인풋 데이터
         weight = 가중치 값
         bias = 편향 값
-        stride = stride 의 가로세로 길이
+        stride = stride 의 가로세로 범위
         
     """
     
@@ -97,7 +92,6 @@ def create_cnn_layer(data, weight, bias, stride):
     return ...
     """
 
-    return 
 
 def create_fc_layer(data, weight, bias):
     """
@@ -117,7 +111,6 @@ def create_fc_layer(data, weight, bias):
 
     return ...
     """
-    return
 
 def createNetwork():
     """
@@ -125,7 +118,8 @@ def createNetwork():
         0 == 아무것도 안하기
         1 == 점프뛰기 
         를 결정하는 인공 신경망을 만드는 함수"""
-
+    data, readout, h_fc1, h_conv1, h_pool1, h_conv2, h_conv3, h_conv3_flat = \
+            0, 0, 0, 0, 0, 0, 0, 0
     # ...을 채우시오
 
     # tensorflow에서 제공하는 tf.placeholder 함수사용
@@ -133,14 +127,17 @@ def createNetwork():
 
         데이터 형태 == 80 * 80크기의 이미지 데이터가 
         4개씩 한 set로
-        정해지지 않은 갯수만큼 저장될 수 있어야 함"""
+        정해지지 않은 갯수만큼 저장할 수 있어야 함
+        (batch의 개수가 32이라서 32이지만 
+        코드에는 None값을 부여한다)"""
     
     """
     data = ...
     """
 
     # 앞에서 만든 create_cnn_layer 사용
-    """ weight 형태 = [8, 8, 4, 32]
+    """ weight 형태 = [8, 8, 4, 32] / 8*8 크기의 filter크기, 
+        4차원을 32차원으로, (4개 한쌍을 32개 한쌍으로)
         bias 형태 = [32]
         stride 가로세로 크기 = 4"""
     """
@@ -148,8 +145,9 @@ def createNetwork():
     """
     
     # 앞에서 만든 max_pool_2x2 함수를 이용하여 pooling layer 생성 및 데이터통과
-    """ 데이터 == h_conv1"""
-
+    """ 데이터 == h_conv1
+        앞에서 만든 max_pool_2x2함수를 이용하여 2*2 filter로 max_pooling을 시킨다"""
+        
     """
     h_pool1 = ...
     """
@@ -157,8 +155,9 @@ def createNetwork():
     # 앞에서 만든 create_cnn_layer 함수를 통하여 두번째 cnn 레이어를 생성 및 데이터통과
     """ 데이터 == h_pool1
         weight 형태 == [4, 4, 32, 64]
-        bias == [64]
-        stride 가로 세로 길이 == 2"""
+        (4*4크기의 필터로 32차원을 64차원으로) -> 32개 한쌍씩을 64개 한쌍씩으로
+        bias == [64] -> 차원 수에 맞춰야 함
+        stride 범위 == 2"""
 
     """
     h_conv2 = ...
@@ -167,15 +166,16 @@ def createNetwork():
     # 앞에서 만든 create_cnn_layer 함수를 통하여 세번째 cnn 레이어를 생성
     """ 데이터 == h_conv2
         weight 형태 == [3, 3, 64, 64]
+        (3*3 크기의 필터로 64차원을 64차원으로)
         bias 형태 == [64]
-        stride 가로 세로 길이 == 1"""
+        stride 범위 == 1"""
 
     """
     h_conv3 = ...
     """
 
     # tensorflow에서 제공하는 tf.reshape함수를 사용하여 레이어들을 통과한 데이터들의
-    # 형태를 [-1, 1600]으로 바꿈 (일자로 쭉 핌)
+    # 형태를 [-1, 1600]으로 바꿈 (일자로 쭉 핌, 한줄에 1600개씩 n(모르니깐 -1)개씩)
     """
         데이터 == h_conv3"""
     """

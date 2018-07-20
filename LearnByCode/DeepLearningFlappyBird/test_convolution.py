@@ -8,36 +8,34 @@ bias_shape = [32]
 
 def test_weight_variable():
     weight = cnn.weight_variable(weight_shape)
-    assert(weight.shape == [8, 8, 4, 32])
+    assert weight.shape == [8, 8, 4, 32], \
+           "return 값의 shape이 parameter 값과 같아야 합니다"
 
 def test_bias_variable():
     bias = cnn.bias_variable(bias_shape)
-    assert(bias.shape == [32])
+    assert bias.shape == [32],\
+           "return값의 shape이 parameter값과 같아야 합니다"
+
+def test_conv2d():
+    conv2d = cnn.conv2d(data, weight=weight_shape, stride=4, bias=bias_shape)
+    assert conv2d.shape == (32, 20, 20, 32),\
+    "output shape -> (32, n, n, 32), \
+    n = ((width - filter_width + (2 * padding)) / stride) + 1, \
+    padding = (filter_width - stride) / 2"
 
 def test_create_cnn_layer():
     h_conv1 = cnn.create_cnn_layer(data, weight=[8, 8, 4, 32], bias=[32], stride=4)    
-    assert(h_conv1.shape == (32, 20, 20, 32))
+    assert h_conv1.shape == (32, 20, 20, 32), \
+    "conv2d 함수가 통과되었다면, output shape는 conv2d와 같아야 합니다"
 
 def test_create_fc_layer():
     data2 = tf.placeholder("float", [32, 1600])
     h_fc1 = cnn.create_fc_layer(data2, weight=[1600, 512], bias=[512])
-    assert(h_fc1.shape == (32, 512))
+    assert h_fc1.shape == (32, 512), \
+    "1600개의 노드를 512개의 노드로 바꾸어야 합니다 -> output shape->(32, 512)"
 
 def test_create_network():
-    h_conv1 = cnn.create_cnn_layer(data, weight=[8, 8, 4, 32], bias=[32], stride=4)
-
-    h_pool1 = cnn.max_pool_2x2(h_conv1)
-
-    h_conv2 = cnn.create_cnn_layer(h_pool1, weight=[4, 4, 32, 64], bias=[64], stride=2)
-
-    h_conv3 = cnn.create_cnn_layer(h_conv2, weight=[3, 3, 64, 64], bias=[64], stride=1)
-
-    h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
-
-    h_fc1 = cnn.create_fc_layer(h_conv3_flat, weight=[1600, 512], bias=[512])
-
-    readout = cnn.create_fc_layer(h_fc1, weight=[512, 2], bias=[2])
-
+    _, readout, h_fc1, h_conv1, h_pool1, h_conv2, h_conv3, h_conv3_flat = cnn.createNetwork() 
     assert(h_conv1.shape == (32, 20, 20, 32))
     assert(h_pool1.shape == (32, 10, 10, 32))
     assert(h_conv2.shape == (32, 5, 5, 64))
