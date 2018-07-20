@@ -16,13 +16,6 @@ def test_bias_variable():
     assert bias.shape == [32],\
            "return값의 shape이 parameter값과 같아야 합니다"
 
-def test_conv2d():
-    conv2d = cnn.conv2d(data, weight=weight_shape, stride=4, bias=bias_shape)
-    assert conv2d.shape == (32, 20, 20, 32),\
-    "output shape -> (32, n, n, 32), \
-    n = ((width - filter_width + (2 * padding)) / stride) + 1, \
-    padding = (filter_width - stride) / 2"
-
 def test_create_cnn_layer():
     h_conv1 = cnn.create_cnn_layer(data, weight=[8, 8, 4, 32], bias=[32], stride=4)    
     assert h_conv1.shape == (32, 20, 20, 32), \
@@ -34,18 +27,8 @@ def test_create_fc_layer():
     assert h_fc1.shape == (32, 512), \
     "1600개의 노드를 512개의 노드로 바꾸어야 합니다 -> output shape->(32, 512)"
 
-def test_create_network():
-    _, readout, h_fc1, h_conv1, h_pool1, h_conv2, h_conv3, h_conv3_flat = cnn.createNetwork() 
-    assert(h_conv1.shape == (32, 20, 20, 32))
-    assert(h_pool1.shape == (32, 10, 10, 32))
-    assert(h_conv2.shape == (32, 5, 5, 64))
-    assert(h_conv3.shape == (32, 5, 5, 64))
-    assert(h_conv3_flat.shape == (32, 1600))
-    assert(h_fc1.shape == (32, 512))
-    assert(readout.shape == (32, 2))
-
 if __name__ == "__main__":
     test_weight_variable()
     test_bias_variable()
     test_create_cnn_layer()
-    test_create_network()
+    test_create_fc_layer()
