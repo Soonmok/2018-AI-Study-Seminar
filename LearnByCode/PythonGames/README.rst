@@ -1,6 +1,6 @@
-2018.07.23
-This repository is copyed by https://github.com/grantjenks/free-python-games.git
-We are using this code for reinforcement Learning. 
+2018.07.23  
+This repository is copyed from https://github.com/grantjenks/free-python-games.git  
+We are using this code for reinforcement Learning.   
 
 Free Python Games
 =================
