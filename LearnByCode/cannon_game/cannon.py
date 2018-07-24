@@ -54,12 +54,12 @@ class Ball:
 
 class Dead_Ball(Ball):
     def draw(self):
-        pygame.draw.rect(screen, dead_ball_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
+        pygame.draw.circle(screen, dead_ball_color, (self.location_x, self.location_y), 5)
         
     
 class Bonus_Ball(Ball):
     def draw(self):
-        pygame.draw.rect(screen, Bonus_ball_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
+        pygame.draw.ellipse(screen, Bonus_ball_color, pygame.Rect(self.location_x, self.location_y, 5, 10))
         
 class Cannon_Ball:
     def __init__(self):
