@@ -1,6 +1,7 @@
 import tensorflow as tf
 import game
 import numpy as np
+import random
 
 from collections import deque
 
@@ -20,6 +21,7 @@ INITIAL_EPSILON = 0.0001 # 초기 epsilon 값
 REPLAY_MEMORY = 50000 # 이전 행동을 기억하는 메모리 크기(행동 갯수)
 BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
+GAME = "cannon_game"
 
 
 def print_info(t, epsilon, action_index, r_t, readout_t):
@@ -89,7 +91,7 @@ def trainNetwork(s, readout, h_fc1, sess):
         
         # save progress every 10000 iterations
         if t % 10000 == 0:
-            saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = t)
+            saver.save(sess, 'save_networks/' + GAME + '-dqn', global_step = t)
         
         print_info(t, epsilon, action_index, r_t, readout_t)
 
