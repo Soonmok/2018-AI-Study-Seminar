@@ -1,4 +1,6 @@
 import pygame
+import random
+import math
 
 BALL_SIZE = 10
 CANNON_BALL_SIZE = 15
@@ -7,16 +9,22 @@ cannonBall_color = (255, 128, 0)
 balls_color = (0, 128, 255)
 dead_ball_color = (255, 0, 0)
 Bonus_ball_color = (255, 255, 255)
+SCREEN_WIDTH = 700
+SCREEN_HIGHT = 300
+
+
+
 
 class Ball:
-    def __init__(self, velocity):
+    def __init__(self, velocity, screen):
         self.location_x = SCREEN_WIDTH + 100 + random.randrange(100)
         self.location_y = random.randrange(300)
         self.velocity = velocity
         self.isCollided = False
+        self.screen = screen
 
     def draw(self):
-        pygame.draw.rect(screen, balls_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
+        pygame.draw.rect(self.screen, balls_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
         
     def update(self):
         self.location_x -= self.velocity
@@ -38,22 +46,25 @@ class Ball:
 # 빨강     
 class Dead_Ball(Ball):
     def draw(self):
-        pygame.draw.circle(screen, dead_ball_color, (self.location_x, self.location_y), 5)
+        pygame.draw.circle(self.screen, dead_ball_color, (self.location_x, self.location_y), 5)
         
     
 # 흰   
 class Bonus_Ball(Ball):
     def draw(self):
-        pygame.draw.ellipse(screen, Bonus_ball_color, pygame.Rect(self.location_x, self.location_y, 5, 10))
+        pygame.draw.ellipse(self.screen, Bonus_ball_color, pygame.Rect(self.location_x, self.location_y, 5, 10))
         
         
 class Cannon_Ball:
-    def __init__(self):
+    def __init__(self, screen):
         self.location_x = -1
         self.location_y = -1
+        self.velocity_x = 1
+        self.velocity_y = 1
+        self.screen = screen
     
     def draw(self):
-        pygame.draw.rect(screen, cannonBall_color, pygame.Rect(self.location_x, self.location_y, CANNON_BALL_SIZE, CANNON_BALL_SIZE))
+        pygame.draw.rect(self.screen, cannonBall_color, pygame.Rect(self.location_x, self.location_y, CANNON_BALL_SIZE, CANNON_BALL_SIZE))
         
     def update(self):
         self.location_x += self.velocity_x
@@ -74,5 +85,3 @@ class Cannon_Ball:
             and self.location_x <= SCREEN_WIDTH \
             and self.location_y >= 0 \
             and self.location_y <=SCREEN_HIGHT
-    
- 

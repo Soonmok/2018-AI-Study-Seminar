@@ -22,6 +22,21 @@ BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
 
 
+def print_info(t, epsilon, action_index, r_t, readout_t):
+    """학습에 관한 변수 값들을 출력합니다"""
+    state = ""
+    if t <= OBSERVE:
+        state = "observe"
+    elif t > OBSERVE and t <= OBSERVE + EXPLORE:
+        state = "explore"
+    else:
+        state = "train"
+    if action_index == 1:
+        print("TIMESTEP", t, "/ STATE", state, \
+            "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, \
+            "/ Q_MAX %e" % np.max(readout_t))
+    
+
 def trainNetwork(s, readout, h_fc1, sess):
     
     cost = get_cost(readout)
@@ -33,28 +48,61 @@ def trainNetwork(s, readout, h_fc1, sess):
 
     epsilon = INITIAL_EPSILON
     t = 0
+    timeout = 0
 
 
-    while true:
+    while True:
         readout_t = readout.eval(feed_dict={s : [s_t]})[0]
         a_t = np.zeros([2])
         action_index = 0
 
         if not game_state.cannon.is_inside():
+            print("not inside")
             act_with_greedy_policy(epsilon, readout_t, a_t)
         else:
             a_t[0] = 1
+            print("inside")
 
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
         s_t1, r_t, terminal = update_env_by_action(game_state, s_t, a_t)
+        timeout += r_t
+        if timeout < -10:
+            print(terminal)
+            terminal = True
+            timeout = 0
+
+        D.append((s_t, a_t, r_t, s_t1, terminal))
+
+        if len(D) > REPLAY_MEMORY:
+            D.popleft()
 
 
+        if t > OBSERVE:
+            # D 큐에서 학습에 필요한  데이터를 샘플링함
+            minibatch = random.sample(D, BATCH)
+            train_network_by_batch(minibatch)
+            
+        s_t = s_t1
+        t += 1
+        
+        # save progress every 10000 iterations
+        if t % 10000 == 0:
+            saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = t)
+        
+        print_info(t, epsilon, action_index, r_t, readout_t)
 
+def playGame():
+    sess = tf.InteractiveSession()
+    s, readout, h_fc1 = cnn.createNetwork()
+    trainNetwork(s, readout, h_fc1, sess)
 
+def main():
+    playGame()
 
-
+if __name__ == "__main__":
+    main()
 
 
 

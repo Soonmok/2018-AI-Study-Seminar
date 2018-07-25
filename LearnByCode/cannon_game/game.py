@@ -12,17 +12,17 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HIGHT))
 done = False
 balls_num = 10
 dead_balls_number = 3
-Bonus_balls_number = 2
+Bonus_balls_number = 7
 
 clock = pygame.time.Clock()
 
 class GameState:
     def __init__(self):
         #initialize game objects
-        self.cannon = Cannon_Ball()
-        self.balls = [Ball(random.randrange(1,5) ) for _ in range(balls_num)]
-        self.dead_balls = [Dead_Ball(random.randrange(1,5) ) for _ in range(dead_balls_number)]
-        self.Bonus_Balls = [Bonus_Ball(random.randrange(1,5) ) for _ in range(Bonus_balls_number)]
+        self.cannon = Cannon_Ball(screen)
+        self.balls = [Ball(random.randrange(1,5), screen ) for _ in range(balls_num)]
+        self.dead_balls = [Dead_Ball(random.randrange(1,5), screen) for _ in range(dead_balls_number)]
+        self.Bonus_Balls = [Bonus_Ball(random.randrange(1,5), screen) for _ in range(Bonus_balls_number)]
 
     # operation per frame
     def frame_step(self, input_actions):
@@ -36,18 +36,17 @@ class GameState:
         # input_actions[0] == 1 : do nothing
         # input_actions[1] == 1 : shoot cannon ball
 
-        if input_actions[1] == 1:    
-            is_clicked = False
-            self.cannon.set_pos(1, SCREEN_HIGHT)
+        # if input_actions[1] == 1:    
+        #     is_clicked = False
+        #     self.cannon.set_pos(1, SCREEN_HIGHT)
 
         #while True:
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     done = True
-            elif event.type == pygame.MOUSEBUTTONUP and not self.cannon.is_inside():
-                pos_x, pos_y = pygame.mouse.get_pos()
-                self.cannon.set_pos(pos_x, pos_y)
+            elif input_actions[1] == 1 and not self.cannon.is_inside():
+                self.cannon.set_pos(100, 100)
 
         for ball in self.balls:
             ball.isCollide(self.cannon)

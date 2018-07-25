@@ -28,8 +28,8 @@ def createNetwork():
     W_fc1 = weight_variable([1600, 512])
     b_fc1 = bias_variable([512])
 
-    W_fc2 = weight_variable([512, ACTIONS])
-    b_fc2 = bias_variable([ACTIONS])
+    W_fc2 = weight_variable([512, 2])
+    b_fc2 = bias_variable([2])
 
     # input layer
     s = tf.placeholder("float", [None, 80, 80, 4])
