@@ -16,18 +16,19 @@ SCREEN_HIGHT = 300
 
 
 class Ball:
-    def __init__(self, velocity, screen):
-        self.location_x = SCREEN_WIDTH + 100 + random.randrange(100)
-        self.location_y = random.randrange(300)
-        self.velocity = velocity
+    def __init__(self, screen, location_x, location_y):
+        #self.location_x = SCREEN_WIDTH + 100 + random.randrange(100)
+        #self.location_y = random.randrange(300)
+        self.location_x = location_x
+        self.location_y = location_y
         self.isCollided = False
         self.screen = screen
 
     def draw(self):
         pygame.draw.rect(self.screen, balls_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
         
-    def update(self):
-        self.location_x -= self.velocity
+    #def update(self):
+    #    self.location_x -= self.velocity
 
     def reset(self):       
         if self.location_x <= 20 or self.isCollided:
@@ -46,7 +47,7 @@ class Ball:
 # 빨강     
 class Dead_Ball(Ball):
     def draw(self):
-        pygame.draw.circle(self.screen, dead_ball_color, (self.location_x, self.location_y), 5)
+        pygame.draw.circle(self.screen, dead_ball_color, (self.location_x, self.location_y), 20)
         
     
 # 흰   
@@ -72,13 +73,14 @@ class Cannon_Ball:
         self.velocity_y -= 0.35
     
     def set_pos(self, x, y):
-        self.location_x = 0
-        self.location_y = SCREEN_HIGHT
         self.velocity = 14 # V (고정)
         self.cursor_location = [x, y]
         self.start_point = [0, SCREEN_HIGHT] 
         self.velocity_x = self.velocity * math.cos(math.atan((SCREEN_HIGHT - y)/x)) # 초기 Vx
         self.velocity_y = self.velocity * math.sin(math.atan((SCREEN_HIGHT - y)/x)) # 초기 Vy
+        print(" velocity x y ")
+        print(self.velocity_x)
+        print(self.velocity_y)
         
     def is_inside(self):
          return self.location_x >= 0 \
