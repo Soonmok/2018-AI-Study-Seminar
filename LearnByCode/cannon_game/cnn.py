@@ -30,6 +30,12 @@ def createNetwork():
 
     W_fc2 = weight_variable([512, 2])
     b_fc2 = bias_variable([2])
+    
+    W_fc3 = weight_variable([2, 512])
+    b_fc3 = bias_variable([512])
+    
+    W_fc4 = weight_variable([512, 2])
+    b_fc4 = bias_variable([2])
 
     # input layer
     s = tf.placeholder("float", [None, 80, 80, 4])
@@ -39,17 +45,18 @@ def createNetwork():
     h_pool1 = max_pool_2x2(h_conv1)
 
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
-    #h_pool2 = max_pool_2x2(h_conv2)
 
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
-    #h_pool3 = max_pool_2x2(h_conv3)
 
-    #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
     h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
 
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
     # readout layer
     readout = tf.matmul(h_fc1, W_fc2) + b_fc2
-
+    readout = tf.sigmoid(readout)
+    
+    readout = tf.matmul(readout, W_fc3) + b_fc3
+    readout = tf.matmul(readout, W_fc4) + b_fc4
+    
     return s, readout, h_fc1
