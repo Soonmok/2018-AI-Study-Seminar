@@ -20,9 +20,11 @@ class GameState:
     def __init__(self):
         #initialize game objects
         self.cannon = Cannon_Ball(screen)
-        self.balls = [Ball(random.randrange(1,5), screen ) for _ in range(balls_num)]
-        self.dead_balls = [Dead_Ball(random.randrange(1,5), screen) for _ in range(dead_balls_number)]
-        self.Bonus_Balls = [Bonus_Ball(random.randrange(1,5), screen) for _ in range(Bonus_balls_number)]
+        # self.balls = [Ball(random.randrange(1,5), screen ) for _ in range(balls_num)]
+        # self.dead_balls = [Dead_Ball(random.randrange(1,5), screen) for _ in range(dead_balls_number)]
+        # self.Bonus_Balls = [Bonus_Ball(random.randrange(1,5), screen) for _ in range(Bonus_balls_number)]
+        self.dead_balls = [Dead_Ball(400,100), Dead_Ball(400,140)]
+        self.Bonus_Balls = [Bonus_Ball(400, 120)]
 
     # operation per frame
     def frame_step(self, input_actions):
@@ -42,6 +44,43 @@ class GameState:
 
         #while True:
         screen.fill((0, 0, 0))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif not self.cannon.is_inside():
+                self.cannon.set_pos(input_actions[0], input_actions[1])
+                
+        for dead_ball in self.dead_balls:
+            dead_ball.isCollide(self.cannon)
+            if dead_ball.isCollide(self.cannon):
+                reward -= -1
+                terminal = True
+            else:
+                dead_ball.draw()
+            dead_ball.reset()
+            dead_ball.update()
+        
+        for bonus_ball in self.Bonus_Balls:
+            bonus_ball.isCollide(self.cannon)
+            if bonus_ball.isCollide(self.cannon):
+                reward += 1
+            else:
+                bonus_ball.draw()
+            bonus_ball.reset()
+            bonus_ball.update()
+            
+        self.cannon.update()
+        self.cannon.draw()
+
+        image_data = pygame.surfarray.array3d(pygame.display.get_surface())
+        pygame.display.update()
+
+        clock.tick(30)
+        return image_data, reward, terminal
+            
+        """
+        Before ->
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     done = True
@@ -77,12 +116,5 @@ class GameState:
                 bonus_ball.draw()
             bonus_ball.reset()
             bonus_ball.update()
+        """
 
-        self.cannon.update()
-        self.cannon.draw()
-
-        image_data = pygame.surfarray.array3d(pygame.display.get_surface())
-        pygame.display.update()
-
-        clock.tick(30)
-        return image_data, reward, terminal

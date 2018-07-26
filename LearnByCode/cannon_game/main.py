@@ -50,7 +50,6 @@ def trainNetwork(s, readout, h_fc1, sess):
 
     epsilon = INITIAL_EPSILON
     t = 0
-    timeout = 0
 
 
     while True:
@@ -62,18 +61,13 @@ def trainNetwork(s, readout, h_fc1, sess):
             print("not inside")
             act_with_greedy_policy(epsilon, readout_t, a_t)
         else:
-            a_t[0] = 1
+            #a_t[0] = 1
             print("inside")
 
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
         s_t1, r_t, terminal = update_env_by_action(game_state, s_t, a_t)
-        timeout += r_t
-        if timeout < -10:
-            print(terminal)
-            terminal = True
-            timeout = 0
 
         D.append((s_t, a_t, r_t, s_t1, terminal))
 
