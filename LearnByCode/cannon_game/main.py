@@ -47,26 +47,34 @@ def trainNetwork(s, readout, h_fc1, sess):
     D = deque()
     s_t = init_env_data(game_state)
     saver = save_and_load_network(sess)
-
     epsilon = INITIAL_EPSILON
+    terminal = False
     t = 0
-
-
+    
     while True:
         readout_t = readout.eval(feed_dict={s : [s_t]})[0]
         a_t = np.zeros([2])
         action_index = 0
 
-        if not game_state.cannon.is_inside():
-            act_with_greedy_policy(epsilon, readout_t, a_t)
-        else:
-            #a_t[0] = 1
-            pass
+        if (not game_state.cannon.is_inside()) \
+            and (not game_state.cannon.isFlying) \
+            or terminal:
+            a_t = act_with_greedy_policy(epsilon, readout_t, a_t)
+            game_state.cannon.set_pos(a_t[0], a_t[1])
+            game_state.reset()
+            game_state.cannon.isFlying = True
+            print("a_t value : ", end="")
+            print(a_t[0], a_t[1])
+
+        elif (not game_state.cannon.is_inside()) and game_state.cannon.isFlying :
+            game_state.cannon.isFlying = False
+            game_state.cannon.reset()
+
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
         s_t1, r_t, terminal = update_env_by_action(game_state, s_t, a_t)
-
+        
         D.append((s_t, a_t, r_t, s_t1, terminal))
 
         if len(D) > REPLAY_MEMORY:
