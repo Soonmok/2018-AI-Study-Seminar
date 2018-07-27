@@ -24,32 +24,26 @@ class GameState:
         # self.dead_balls = [Dead_Ball(random.randrange(1,5), screen) for _ in range(dead_balls_number)]
         # self.Bonus_Balls = [Bonus_Ball(random.randrange(1,5), screen) for _ in range(Bonus_balls_number)]
         self.dead_balls = [Dead_Ball(screen, 400,100), Dead_Ball(screen, 400,250)]
-        self.Bonus_Balls = [Bonus_Ball(screen, 400, 180)]
+        self.Bonus_Balls = [Bonus_Ball(screen, 390, 160)]
+    
+    def reset(self):
+        self.dead_balls = [Dead_Ball(screen, 400,100), Dead_Ball(screen, 400,250)]
+        self.Bonus_Balls = [Bonus_Ball(screen, 390, 160)]
 
     # operation per frame
     def frame_step(self, input_actions):
-        ##get mouse input
-        #x, y = pygame.mouse.get_pos()
         pygame.event.pump()
-
         reward = -0.1
         terminal = False
 
-        # input_actions[0] == 1 : do nothing
-        # input_actions[1] == 1 : shoot cannon ball
-
-        # if input_actions[1] == 1:    
-        #     is_clicked = False
-        #     self.cannon.set_pos(1, SCREEN_HIGHT)
-
         #while True:
         screen.fill((0, 0, 0))
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-        self.cannon.set_pos(input_actions[0], input_actions[1])
-        print("input_actions")
+        #self.cannon.set_pos(input_actions[0], input_actions[1])
+        print("input_actions :", end="")
         print(input_actions[0], input_actions[1])
                 
         for dead_ball in self.dead_balls:
