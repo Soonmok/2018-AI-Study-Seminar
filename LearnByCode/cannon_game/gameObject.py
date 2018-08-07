@@ -1,102 +1,91 @@
 import pygame
-import random
 import math
 
-BALL_SIZE = 20
-CANNON_BALL_SIZE = 15
-COLLISION_DISTANCE = math.sqrt(2) * BALL_SIZE
-cannonBall_color = (255, 128, 0)
-balls_color = (0, 128, 255)
-dead_ball_color = (255, 0, 0)
-Bonus_ball_color = (255, 255, 255)
-SCREEN_WIDTH = 700
-SCREEN_HIGHT = 300
-INITIAL_VELOCITY = 14
+BALLS_COLOR = (255, 255, 255)
+BARRICADE_Init_POSX = 100
+BARRICADE_Init_POSY = 100
+BARRICADE_SPEED = 2
+BARRICADE_WIDTH = 40
+BARRICADE_HEIGHT = 40
+BARRICADE_COLOUR = (255, 255, 255)
+
+TERMINATE_Init_POSX = 380
+TERMINATE_Init_POSY = 270
+TERMINATE_RADIUS = 5
+TERMINATE_SIZE = TERMINATE_RADIUS * 2
 
 
-# Basic Ball 
-class Ball:
-    def __init__(self, screen, location_x, location_y):
-        # Ball의 좌표 값, screen 설정
-        self.location_x = location_x
-        self.location_y = location_y
-        self.screen = screen
-
-        # 충돌여부 초기화
-        self.isCollided = False
-
-    # 사각형 
-    def draw(self):
-        pygame.draw.rect(self.screen, balls_color, pygame.Rect(self.location_x, self.location_y, BALL_SIZE, BALL_SIZE))
-
-    # 사각형의 x 좌표를 변화 시킨다. 
-    def update(self):
-        pass #20180727
-
-    # 위치가 화면을 벗어나거나, 공이 충돌한 경우 원래 위치로 초기화 시켜준다.
-    def reset(self):
-        pass #20180727
-        if self.location_x <= 20 or self.isCollided:
-            self.location_x = SCREEN_WIDTH + 100 + random.randrange(100)
-            self.isCollided = False
+class Barricade:
     
-    # cannon_ball 과 Ball 사이의 거리가 COLLISION_DISTANCE 보다 작다면 충돌했다
-    # 가정.
-    def isCollide(self, cannon_ball):
-        if math.sqrt(math.pow((cannon_ball.location_x - self.location_x), 2) \
-                  + math.pow((cannon_ball.location_y - self.location_y), 2)) < COLLISION_DISTANCE:
-            self.isCollided = True
+    def __init__(self, screen, scr_width):
+        self.width = BARRICADE_WIDTH
+        self.height = BARRICADE_HEIGHT
+        self.location_x = BARRICADE_Init_POSX + self.width / 2
+        self.location_y = BARRICADE_Init_POSY + self.height / 2
+        self.speed = BARRICADE_SPEED
+        self.screen = screen
+        self.scr_width = scr_width
+    
+    # tryangle
+    def draw(self):
+        points = [[self.location_x, self.location_y - self.height / 2], [self.location_x - self.width / 2, self.location_y + self.height / 2], [self.location_x + self.width / 2, self.location_y + self.height / 2]]
+        pygame.draw.polygon(self.screen, BARRICADE_COLOUR, points)        
+    
+    def isClose(self):
+        return self.location_x  < 5 or self.location_x > self.scr_width - 5
+        
+    def update(self):
+        if self.isClose() :
+            self.speed *= -1 
+        self.location_x += self.speed
+        
+    def iscrashed(self, x, y):
+        if math.sqrt((self.location_x - x)**2 + (self.location_y - y)**2) < 15:
             return True
         else:
-            self.isCollided = False
             return False
-
-# 빨강 Ball     
-class Dead_Ball(Ball):
-    def draw(self):
-        pygame.draw.circle(self.screen, dead_ball_color, (self.location_x, self.location_y), 20)
-
-# 흰 Ball  
-class Bonus_Ball(Ball):
-    def draw(self):
-        pygame.draw.ellipse(self.screen, Bonus_ball_color,
-                            pygame.Rect(self.location_x, self.location_y, 20, 20))
-
-# Cannon_ball
-class Cannon_Ball:
-    def __init__(self, screen):
-        self.isFlying = False
-        self.location_x = -1
-        self.location_y = SCREEN_HIGHT
-        self.velocity_x = 1
-        self.velocity_y = 1
+        
+class Terminate:
+    
+    def __init__(self, screen, scr_width, scr_height):
         self.screen = screen
-        self.velocity = INITIAL_VELOCITY # V (고정)
-
+        self.location_x = TERMINATE_Init_POSX
+        self.location_y = TERMINATE_Init_POSY
+        self.size = TERMINATE_SIZE
+        self.scr_width = scr_width
+        self.scr_height = scr_height
+        self.radius = TERMINATE_RADIUS
+        
     def draw(self):
-        pygame.draw.rect(self.screen, cannonBall_color,
-                         pygame.Rect(self.location_x, self.location_y, CANNON_BALL_SIZE, CANNON_BALL_SIZE))
+       pygame.draw.circle(self.screen, BARRICADE_COLOUR, [self.location_x, self.location_y], self.radius)
+       
+    def isCrashed(self, x, y):
+        distance = math.sqrt((x - self.location_x)**2 + (y - self.location_y) ** 2)
+        if distance < 15 :
+            return True
+        else :
+            return False
+        
+class Character:
+    
+    def __init__(self, screen):
+        self.width = 30
+        self.height = 30
+        self.location_x = 10 + self.width / 2
+        self.location_y = 10 + self.height / 2
+        self.screen = screen
+        self.pressed = pygame.key.get_pressed()
+    
+    def draw(self):
+        pygame.draw.rect(self.screen, BALLS_COLOR,
+            pygame.Rect(self.location_x - self.width / 2, self.location_y - self.height / 2,
+            self.height, self.width))
+            
+    def update(self, pressed):
+        if pressed[pygame.K_UP] and self.location_y >= 0 + self.height / 2: self.location_y -= 3
+        if pressed[pygame.K_DOWN] and self.location_y <= 300 - self.height / 2 : self.location_y += 3
+        if pressed[pygame.K_LEFT] and self.location_x >= 0 + self.width / 2: self.location_x -= 3
+        if pressed[pygame.K_RIGHT] and self.location_x <= 400 - self.width/ 2: self.location_x += 3
+        
 
-    def update(self):
-        self.location_x += self.velocity_x
-        self.location_y -= self.velocity_y
-        self.velocity_y -= 0.35 #0.35 means G
-
-    def set_pos(self, input_x, input_y):
-        self.location_x = 0
-        self.location_y = SCREEN_HIGHT
-        #self.start_point = [0, SCREEN_HIGHT] #20180725
-        self.velocity_x = self.velocity *\
-            math.cos(math.atan((SCREEN_HIGHT - input_y)/input_x)) # 초기 Vx
-        self.velocity_y = self.velocity *\
-            math.sin(math.atan((SCREEN_HIGHT - input_y)/input_x)) # 초기 Vy
-
-    def reset(self):
-        self.location_x = -1
-        self.location_y = SCREEN_HIGHT
-
-    def is_inside(self):
-         return self.location_x >= 0 \
-            and self.location_x <= SCREEN_WIDTH \
-            and self.location_y >= 0 \
-            and self.location_y <=SCREEN_HIGHT
+        
