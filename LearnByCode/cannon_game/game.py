@@ -51,6 +51,7 @@ class GameState:
             reward = 1
             print("crashed terminal")
             terminal = True
+            self.__init__()
         screen.fill((0, 0, 0))
         self.character.draw()
         self.barricade.draw()
