@@ -2,9 +2,8 @@ import pygame
 import math
 
 BALLS_COLOR = (255, 255, 255)
-BARRICADE_Init_POSX = 100
-BARRICADE_Init_POSY = 100
-BARRICADE_SPEED = 2
+
+BARRICADE_SPEED = 6
 BARRICADE_WIDTH = 40
 BARRICADE_HEIGHT = 40
 BARRICADE_COLOUR = (255, 255, 255)
@@ -17,14 +16,14 @@ TERMINATE_SIZE = TERMINATE_RADIUS * 2
 
 class Barricade:
     
-    def __init__(self, screen, scr_width):
+    def __init__(self, screen, x, y):
         self.width = BARRICADE_WIDTH
         self.height = BARRICADE_HEIGHT
-        self.location_x = BARRICADE_Init_POSX + self.width / 2
-        self.location_y = BARRICADE_Init_POSY + self.height / 2
+        self.location_x = x + self.width / 2
+        self.location_y = y + self.height / 2
         self.speed = BARRICADE_SPEED
         self.screen = screen
-        self.scr_width = scr_width
+        self.scr_width = 400
     
     # tryangle
     def draw(self):
@@ -40,7 +39,7 @@ class Barricade:
         self.location_x += self.speed
         
     def iscrashed(self, x, y):
-        if math.sqrt((self.location_x - x)**2 + (self.location_y - y)**2) < 15:
+        if math.sqrt((self.location_x - x)**2 + (self.location_y - y)**2) < 30:
             return True
         else:
             return False
@@ -81,11 +80,11 @@ class Character:
             pygame.Rect(self.location_x - self.width / 2, self.location_y - self.height / 2,
             self.height, self.width))
             
-    def update(self, pressed):
-        if pressed[pygame.K_UP] and self.location_y >= 0 + self.height / 2: self.location_y -= 3
-        if pressed[pygame.K_DOWN] and self.location_y <= 300 - self.height / 2 : self.location_y += 3
-        if pressed[pygame.K_LEFT] and self.location_x >= 0 + self.width / 2: self.location_x -= 3
-        if pressed[pygame.K_RIGHT] and self.location_x <= 400 - self.width/ 2: self.location_x += 3
+    def update(self, input_action):
+        if input_action[1] == 1 and self.location_y >= 0 + self.height / 2: self.location_y -= 3
+        if input_action[2] == 1 and self.location_y <= 300 - self.height / 2 : self.location_y += 3
+        if input_action[3] == 1 and self.location_x >= 0 + self.width / 2: self.location_x -= 3
+        if input_action[4] == 1 and self.location_x <= 400 - self.width/ 2: self.location_x += 3
+        if input_action[0] == 1 and self.location_x <= 400 - self.width/ 2: self.location_x += 3
         
-
         

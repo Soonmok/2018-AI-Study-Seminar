@@ -6,7 +6,7 @@ import tensorflow as tf
 # prediction : 예측값
 # y : 정답 값 (실 정답은 아니고, 가지고 있던 값)
 def get_prediction(readout):
-    action = tf.placeholder("float", [None, 2])
+    action = tf.placeholder("float", [None, 5])
     y = tf.placeholder("float", [None])
     """action * prediction(wx + b) == 예측값(q),y == replay batch에서 나온값"""
     prediction = tf.reduce_sum(tf.multiply(readout, action), reduction_indices=1)

@@ -28,14 +28,9 @@ def createNetwork():
     W_fc1 = weight_variable([1600, 512])
     b_fc1 = bias_variable([512])
 
-    W_fc2 = weight_variable([512, 2])
-    b_fc2 = bias_variable([2])
+    W_fc2 = weight_variable([512, 5])
+    b_fc2 = bias_variable([5])
     
-    W_fc3 = weight_variable([2, 512])
-    b_fc3 = bias_variable([512])
-    
-    W_fc4 = weight_variable([512, 2])
-    b_fc4 = bias_variable([2])
 
     # input layer
     s = tf.placeholder("float", [None, 80, 80, 4])
@@ -54,9 +49,5 @@ def createNetwork():
 
     # readout layer
     readout = tf.matmul(h_fc1, W_fc2) + b_fc2
-    readout = tf.sigmoid(readout)
-    
-    readout = tf.matmul(readout, W_fc3) + b_fc3
-    readout = tf.matmul(readout, W_fc4) + b_fc4
     
     return s, readout, h_fc1

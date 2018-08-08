@@ -6,7 +6,7 @@ from image_processing import process_image, stack_images
 def init_env_data(game_state):
     # 초기 상태를 점프뛰지 않는 상태로 두고 이미지를 80 * 80 * 4 형태로 preprocessing함
     """ do_nothing == [1, 0]"""
-    do_nothing = np.zeros(2)
+    do_nothing = np.zeros(5)
     do_nothing[0] = 1
 
     """ game_state.frame_step => 행동 input을 기반으로 게임에 변화를 줌

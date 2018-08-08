@@ -12,7 +12,7 @@ from game_reinforcement_env import init_env_data, update_env_by_action
 from neural_network_utils import get_cost, save_and_load_network, train_network_by_batch
 from reinforcement_utils import act_with_greedy_policy
 
-ACTIONS = 2 # 유효한 액션 수 (뛰기, 그대로 있기)
+ACTIONS = 5 # 유효한 액션 수 (left, right, up, down)
 GAMMA = 0.99 # decay rate (강화학습에 있는 개념)
 OBSERVE = 10000
 EXPLORE = 3000000
@@ -21,7 +21,7 @@ INITIAL_EPSILON = 0.1
 REPLAY_MEMORY = 50000 # 이전 행동을 기억하는 메모리 크기(행동 갯수)
 BATCH = 32 # 배치 크기
 FRAME_PER_ACTION = 1
-GAME = "cannon_game"
+GAME = "rl game"
 
 
 def print_info(t, epsilon, action_index, r_t, readout_t):
@@ -53,22 +53,13 @@ def trainNetwork(s, readout, h_fc1, sess):
     
     while True:
         readout_t = readout.eval(feed_dict={s : [s_t]})[0]
-        a_t = np.zeros([2])
+        a_t = np.zeros([5])
         action_index = 0
 
-        if (not game_state.cannon.is_inside()) \
-            and (not game_state.cannon.isFlying) \
-            or terminal:
-            a_t = act_with_greedy_policy(epsilon, readout_t, a_t)
-            game_state.cannon.set_pos(a_t[0], a_t[1])
-            game_state.reset()
-            game_state.cannon.isFlying = True
-            print("a_t value : ", end="")
-            print(a_t[0], a_t[1])
-
-        elif (not game_state.cannon.is_inside()) and game_state.cannon.isFlying :
-            game_state.cannon.isFlying = False
-            game_state.cannon.reset()
+        if t % FRAME_PER_ACTION == 0:
+            act_with_greedy_policy(epsilon, readout_t, a_t)
+        else:
+            a_t[0] = 1 # do nothing
 
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
