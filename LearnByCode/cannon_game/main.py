@@ -29,12 +29,12 @@ def print_info(t, epsilon, action_index, r_t, readout_t):
     state = ""
     if t <= OBSERVE:
         state = "observe"
+        print("observe")
     elif t > OBSERVE and t <= OBSERVE + EXPLORE:
         state = "explore"
     else:
         state = "train"
-    if action_index == 1:
-        print("TIMESTEP", t, "/ STATE", state, \
+    print("TIMESTEP", t, "/ STATE", state, \
             "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, \
             "/ Q_MAX %e" % np.max(readout_t))
     
