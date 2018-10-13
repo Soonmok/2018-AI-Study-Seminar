@@ -9,7 +9,7 @@ import gameObject
 import cnn
 
 from game_reinforcement_env import init_env_data, update_env_by_action
-from neural_network_utils import get_cost, save_and_load_network, train_network_by_batch
+from neural_network_utils import save_and_load_network, train_network_by_batch
 from reinforcement_utils import act_with_greedy_policy
 
 ACTIONS = 5 # 유효한 액션 수 (left, right, up, down)
@@ -29,20 +29,24 @@ def print_info(t, epsilon, action_index, r_t, readout_t):
     state = ""
     if t <= OBSERVE:
         state = "observe"
+        print("observe")
     elif t > OBSERVE and t <= OBSERVE + EXPLORE:
         state = "explore"
     else:
         state = "train"
-    if action_index == 1:
-        print("TIMESTEP", t, "/ STATE", state, \
+    print("TIMESTEP", t, "/ STATE", state, \
             "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, \
             "/ Q_MAX %e" % np.max(readout_t))
     
 
 def trainNetwork(s, readout, h_fc1, sess):
     
-    cost = get_cost(readout)
+    a = tf.placeholder("float", [None, 5])
+    y = tf.placeholder("float", [None])
+    readout_action = tf.reduce_sum(tf.multiply(readout, a), reduction_indices=1)
+    cost = tf.reduce_mean(tf.square(y - readout_action))
     train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
+
     game_state = game.GameState()
     D = deque()
     s_t = init_env_data(game_state)
@@ -75,7 +79,7 @@ def trainNetwork(s, readout, h_fc1, sess):
         if t > OBSERVE:
             # D 큐에서 학습에 필요한  데이터를 샘플링함
             minibatch = random.sample(D, BATCH)
-            train_network_by_batch(minibatch)
+            train_network_by_batch(minibatch, readout, train_step, s, a, y)
             
         s_t = s_t1
         t += 1

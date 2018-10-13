@@ -1,6 +1,7 @@
 import tensorflow as tf
+import numpy as np
 
-
+GAMMA = 0.99
 # 상태에 따른 행동 값을 압축? 시켜서 전달
 #    readout : 상태에 따른 행동 값
 # prediction : 예측값
@@ -15,13 +16,10 @@ def get_prediction(readout):
 # (정답 - 예측)^2 으로 손실값을 줄임.
 #     prediction : 상태에 따른 행동 값
 # 손실값이 줄어든 tensor 를 되돌려줌
-def get_cost(prediction):
-    prediction_action, y = get_prediction(prediction)
-    """ 예측값과 batch에서 나온 값들의 오류로 학습"""
-    return tf.reduce_mean(tf.square(y - prediction_action))
 
 
-def train_network_by_batch(minibatch, readout, train_step):
+
+def train_network_by_batch(minibatch, readout, train_step, s, a, y):
     # batch로 변수 파싱
     """
         s_j_batch == 행동전 게임 상태,
@@ -38,8 +36,6 @@ def train_network_by_batch(minibatch, readout, train_step):
 
     """ batch 데이터로 예측한 readout 값(wx + b)"""
     readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
-    print("==================================================")
-    print(readout_j1_batch)
 
     for i in range(0, len(minibatch)):
         terminal = minibatch[i][4]
@@ -60,7 +56,7 @@ def save_and_load_network(sess):
 
     saver = tf.train.Saver()
     sess.run(tf.initialize_all_variables())
-    checkpoint = tf.train.get_checkpoint_state("saved_networks")
+    checkpoint = tf.train.get_checkpoint_state("save_networks")
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
         print("Successfully loaded:", checkpoint.model_checkpoint_path)

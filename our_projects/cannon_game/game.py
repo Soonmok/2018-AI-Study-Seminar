@@ -8,21 +8,26 @@ screen = pygame.display.set_mode((400, 300))
 done = False
 FPSCLOCK = pygame.time.Clock()
 
-
+def get_distance(location1, location2):
+    x = (location2[0] - location1[0]) * (location2[0] - location1[0])
+    y = (location2[1] - location1[1]) * (location2[1] - location1[1])
+    return math.sqrt(x + y)
 
 class GameState:
     def __init__(self):
         # initialize objects
         self.character = Character(screen)
-        self.barricade = Barricade(screen, 300, 0)
-        self.barricade2 = Barricade(screen, 200, 200)
+        self.barricade = Barricade(screen, 100,random.randrange(0,200))
+        self.barricade2 = Barricade(screen, 200,random.randrange(0,200))
         self.terminate = Terminate(screen, 400, 300)
+        self.timer = 0
+
 
     def frame_step(self, input_actions):
         # internally process pygame event handlers
         pygame.event.pump()
 
-        reward = -0.1
+        reward = 0
         terminal = False
 
         if sum(input_actions) != 1:
@@ -40,25 +45,47 @@ class GameState:
         self.barricade.update()
         self.barricade2.update()
         # check if character collides with barricade
-        
+        # if (get_distance(self.character.location, self.terminate.location) / 1000.0) < 0.45:
+        #     reward = 0.1
 
+        # if (get_distance(self.character.location, self.terminate.location) / 1000.0) < 0.35:
+        #     reward = 0.2
+        
+        # if (get_distance(self.character.location, self.terminate.location) / 1000.0) < 0.25:
+        #     reward = 0.4
+
+        # if (get_distance(self.character.location, self.terminate.location) / 1000.0) < 0.15:
+        #     reward = 0.6
+        reward = -(get_distance(self.character.location, self.terminate.location)/ 100000)
         if self.barricade.iscrashed(self.character.location_x, self.character.location_y) or self.barricade2.iscrashed(self.character.location_x, self.character.location_y):
             reward = -1
             print("crashed")
             terminal = True
-            self.__init__()
+            
         if self.terminate.isCrashed(self.character.location_x, self.character.location_y):
-            reward = 1
+            reward = 1000
             print("crashed terminal")
             terminal = True
-            self.__init__()
+            
         screen.fill((0, 0, 0))
         self.character.draw()
         self.barricade.draw()
         self.barricade2.draw()
         self.terminate.draw()
+        print(reward)
+        
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())
+        if self.timer == 1000:
+            self.timer = 0
+            terminal = True
+        if not self.timer % 100:
+            print("=============================================================")
+            print("Game Timer :", end = "")
+            print(self.timer)
+        if terminal:
+            self.__init__()
         pygame.display.update()
         FPSCLOCK.tick(30)
-        #print self.upperPipes[0]['y'] + PIPE_HEIGHT - int(BASEY * 0.2)
+        self.timer += 1
+        
         return image_data, reward, terminal
