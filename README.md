@@ -18,6 +18,8 @@ https://github.com/llSourcell/How_to_simulate_a_self_driving_car
 
 This repository includes korean comments to help understand a Self Driving car project
 
+please leave issues if you have a problem with running code or questions
+
 ## Several study resources to share
 
 This repository includes resources to study reinforcement learning 
@@ -62,3 +64,5 @@ Udacity에서 제공하는 자율주행 자동차 구현을 위한 시뮬레이�
 
 ### [4. Open Source pythonGames](https://github.com/grantjenks/free-python-games)  
 > `git clone https://github.com/grantjenks/free-python-games`
+
+질문 사항이나 버그가 있다면 issue에 남겨주세요.
