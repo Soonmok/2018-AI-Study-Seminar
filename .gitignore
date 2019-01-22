@@ -1,4 +1,5 @@
-*.pyc
+:*.pyc
 LearnByCode/DeepLearningFlappyBird/.cache/
 *.swo
 *.swp
+*.h5
