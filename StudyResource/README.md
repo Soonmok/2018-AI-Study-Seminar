@@ -19,6 +19,12 @@ https://wikidocs.net/book/587
 ## 구글에서 제공하는 딥러닝 관련 강의내용입니다.
 https://developers.google.com/machine-learning/crash-course/ml-intro
 
+## Wiki docs 
+본 프로젝트 wikidocs 에 딥러닝 공부관련 자료 링크들이 많이 있습니다. 참고 바랍니다.
 
-## 추천 테크트리 
-1. Machine learning is fun -> 2. 앤드류 응 교수님 수업 정리 or 구글 딥러닝 관련 강의 -> 3. Wild ML deep learning glossary 반복
+## 딥러닝 공부 테크트리 
+1. Machine learning is fun
+2. 앤드류 응 교수님 수업 정리 or 구글 딥러닝 관련 강의 
+3. Wild ML deep learning glossary 반복
+4. Learn By code 디렉토리 공부 및 이해
+5. 최신 논문 구현
