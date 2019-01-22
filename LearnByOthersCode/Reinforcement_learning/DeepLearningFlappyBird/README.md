@@ -13,13 +13,27 @@
 * pygame
 * OpenCV-Python
 
-사용하기 쉽도록 docker image를 만들어 곧 베포할 예정
+1. 로컬 환경에다가 바로 깔기
+```
+pip install tensorflow-gpu (or pip install tensorflow)      // tensorflow cpu 버전으로는 학습이 굉장히 느림
+pip install pygame
+sudo apt-get install python-opencv
+```
 
 ## 실행 방법
 ```
 cd DeepLearningFlappyBird
 python deep_q_network.py
 ```
+
+2. Docker 환경을 통하여 실행하기
+```
+docker run -it -runtime=nvidia soonmok/2018-ai-study-seminar bash
+cd 2018-AI-Study-Seminar/Reinforcement_learning/DeepLearningFlappyBird
+python deep_q_network.py
+```
+배포된 버전은 tensorflow-gpu버전이며, cpu 버전 docker image를 만들어 곧 베포할 예정
+
 
 ## What is Deep Q-Network?
 DQN(Deep Q Network)란?
