@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from keras.layers.convolutional import Conv2D
 from keras.layers import Dense, Flatten
 from keras.optimizers import RMSprop

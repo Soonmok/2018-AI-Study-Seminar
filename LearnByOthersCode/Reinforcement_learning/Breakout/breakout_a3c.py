@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from skimage.color import rgb2gray
 from skimage.transform import resize
 from keras.layers import Dense, Flatten, Input
