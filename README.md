@@ -10,15 +10,13 @@ This directory includes some famous and fun RL project with korean comments
 This directory also includes deep learning paper implement project with korean comments
 All codes in this directory are from other open source projects
 
-Here is original project URL
+Here is the original project URL
 
-### [1. DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
+### 1. [DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
 https://github.com/yenchenlin/DeepLearningFlappyBird
 
-### 2. [DQN for a Self Driving car](https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
-https://github.com/llSourcell/How_to_simulate_a_self_driving_car
-
-This repository includes korean comments to help understand a Self Driving car project
+### 2. [RL for atari game](https://github.com/rlcode/reinforcement-learning-kr/tree/master/3-atari/1-breakout)
+This repository includes korean comments to help understand a Reinforcement learning applied to atari game
 
 ## Questions
 please leave issues if you have a problem with running code or questions
@@ -43,10 +41,8 @@ This repository includes resources to study reinforcement learning
 ### [1. DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
 https://github.com/yenchenlin/DeepLearningFlappyBird
 
-### [2. DQN for a Self Driving car](https://github.com/llSourcell/How_to_simulate_a_self_driving_car)
-https://github.com/llSourcell/How_to_simulate_a_self_driving_car
-
-https://github.com/rlcode/reinforcement-learning-kr 
+### 2. [RL for atari game](https://github.com/rlcode/reinforcement-learning-kr/tree/master/3-atari/1-breakout)
+아타리 게임에 여러가지 강화학습 알고리즘을 적용한 프로젝트입니다.
 
 ## Several study resources to share
 
