@@ -6,3 +6,8 @@
 번역본과 원문이 둘다 존재하니 영어로도 읽어보고 한글로도 읽어보도록 합시다!
 
 https://medium.com/@jongdae.lim/%EA%B8%B0%EA%B3%84-%ED%95%99%EC%8A%B5-machine-learning-%EC%9D%80-%EC%A6%90%EA%B2%81%EB%8B%A4-part-1-9a0297198ad8
+
+머신러닝 공부에 자주 등장하는 단어를 정리한 사이트입니다. 틈틈히 읽어보면서 개념을 익히도록 합시다!
+
+http://www.wildml.com/deep-learning-glossary/   (내용은 영어입니다.)
+
