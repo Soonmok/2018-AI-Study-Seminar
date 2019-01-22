@@ -1,6 +1,6 @@
 # ignore all pyc files.
 *.pyc
-
+saved_networks/
 
 .*.swp
 
