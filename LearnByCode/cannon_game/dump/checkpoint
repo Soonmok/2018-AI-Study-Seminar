@@ -1,6 +1,0 @@
-model_checkpoint_path: "rl game-dqn-120000"
-all_model_checkpoint_paths: "rl game-dqn-80000"
-all_model_checkpoint_paths: "rl game-dqn-90000"
-all_model_checkpoint_paths: "rl game-dqn-100000"
-all_model_checkpoint_paths: "rl game-dqn-110000"
-all_model_checkpoint_paths: "rl game-dqn-120000"
