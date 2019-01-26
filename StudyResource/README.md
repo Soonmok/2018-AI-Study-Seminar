@@ -13,6 +13,7 @@ https://medium.com/@jongdae.lim/%EA%B8%B0%EA%B3%84-%ED%95%99%EC%8A%B5-machine-le
 머신러닝 공부에 자주 등장하는 단어를 정리한 사이트입니다. 틈틈히 읽어보면서 개념을 익히도록 합시다!
 
 http://www.wildml.com/deep-learning-glossary/   (내용은 영어입니다.)
+https://developers.google.com/machine-learning/glossary/?hl=ko . (한글 자료입니다.)
 
 ## 앤드류 응 교수님의 강의를 한글로 정리한 사이트입니다.
 https://wikidocs.net/book/587
@@ -23,7 +24,7 @@ https://developers.google.com/machine-learning/crash-course/ml-intro
 ## Wiki docs 
 본 프로젝트 wikidocs 에 딥러닝 공부관련 자료 링크들이 많이 있습니다. 참고 바랍니다.
 
-## 딥러닝 공부 테크트리 
+## 딥러닝 공부  
 1. Machine learning is fun
 2. 앤드류 응 교수님 수업 정리 or 구글 딥러닝 관련 강의 
 3. Wild ML deep learning glossary 반복
