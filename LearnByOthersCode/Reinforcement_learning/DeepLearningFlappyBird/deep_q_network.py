@@ -1,3 +1,5 @@
+
+# -*- coding: utf-8 -*- 
 #!/usr/bin/env python
 from __future__ import print_function
 # 학습을 위한 툴인 텐서플로우를 불러옵니다

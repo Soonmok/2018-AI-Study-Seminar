@@ -10,6 +10,9 @@ This directory includes some famous and fun RL project with korean comments
 This directory also includes deep learning paper implement project with korean comments
 All codes in this directory are from other open source projects
 
+## Our projects
+This directory includes projects we implement used deep learning 
+
 Here is the original project URL
 
 ### 1. [DQN for Flappy Bird game](https://github.com/yenchenlin/DeepLearningFlappyBird)
@@ -35,6 +38,9 @@ This repository includes resources to study reinforcement learning
 ## Learn by others code
 이 폴더에서는 깃허브에서 공유되는 유명한 강화학습 관련 프로젝트 코드를 한국어 주석과 같이 제공합니다.
 딥러닝 분야에서 유명한 논문들을 구현한 코드를 한국어 주석과 같이 제공합니다.
+
+## our projects
+딥러닝 기술을 활용하여 진행한 프로젝트를 공유하는 폴더입니다.
 
 원작 프로젝트에 대한 URL
 
