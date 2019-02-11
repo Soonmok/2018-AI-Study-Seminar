@@ -3,21 +3,26 @@ import numpy as np
 
 
 class AutoEncoder(object):
-    def __init__(self, X):
-        features = self.encode(X)
+    def __init__(self, X, hidden_size):
+        features = self.encode(X, hidden_size)
         X_reconstructed = self.decode(features)
-        self.X_reconstructed = X_reconstructed
+        self.rating_recontructed = X_reconstructed
         self.features = features
-    
-    def encode(self, x_input):
-        with tf.name_scope('Encode'):
-            Encode_layer_1 = tf.layers.dense(inputs=x_input, units=10000, activation=tf.nn.selu)
-            Encode_layer_2 = tf.layers.dense(inputs=Encode_layer_1, units=1024, activation=tf.nn.selu)
-            features = tf.layers.dense(inputs=layer_2, units=512)
+ 
+    def encode(self, x_input, hidden_size):
+        features = tf.layers.dense(
+            inputs=x_input, 
+            units=x_input.shape[1],
+            activation=tf.nn.sigmoid,
+            name="encode")
+        self.w_encoder = tf.get_variable("encode/W:0")[0]
         return features
 
-    def decode(self, features):
-        with tf.name_scope('Decode'):
-            Decode_layer_1 = tf.layers.dense(inputs=features, units=1024, activation=tf.nn.selu)
-            X_reconstructed = tf.layers.dense(inputs=Decode_layer_1, units=10000, activation=tf.nn.selu)
+    def decode(self, features, recontruction_size):
+        X_reconstructed = tf.layers.dense(
+            inputs=features,
+            units=recontruction_size, 
+            activation=tf.nn.selu,
+            name="decode")
+        self.w_decoder = tf.get_variable("decode/W:0")[0]
         return X_reconstructed

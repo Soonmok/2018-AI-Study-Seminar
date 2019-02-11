@@ -1,6 +1,21 @@
 import numpy as np 
 import pandas as pd
+import _pickle as pickle
 from sklearn.model_selection import train_test_split
+
+def batch_iter(dataset, batch_size):
+    """ make batch dataset for learning 
+        Args :
+            dataset : dataset to divide into batch segment
+            batch_size : batch_size
+        returns :
+            dataset[start_idx:end_idx] : batch segments of dataset"""
+
+    for idx in range(len(dataset) / batch_size):
+        start_idx = idx * batch_size 
+        end_idx = min((idx + 1) * batch_size, len(dataset)-1)
+        input_mask = (dataset[start_idx:end_idx] != 0).astype(np.float32)
+        yield list(zip(dataset[start_idx:end_idx], input_mask))
 
 def load_data(file_path):
   """ load csv file and create dataset for deep learning
@@ -16,8 +31,8 @@ def load_data(file_path):
   indices = range(len(rating_data))
   train_indices, test_indices = train_test_split(indices, shuffle=True)
   train_indices, dev_indices = train_test_split(train_indices, test_size=0.1, shuffle=True)
-  print("loading total data{} train {} test {}".format(
-        len(indices), len(train_indices), len(dev_indices)))
+  print("loading total data{} train {} dev {} test {}".format(
+        len(indices), len(train_indices), len(dev_indices), len(test_indices)))
 
   num_users = rating_data.userId.nunique()
   num_movies = rating_data.movieId.nunique()
@@ -69,14 +84,17 @@ def load_data(file_path):
     for row in rating_data.iloc[indices].itertuples():
       user_idx = get_user_idx(row.userId)
       movie_idx = get_movie_idx(row.movieId)
-      if movie_idx > len(movie_idxs):
-        print("outlier movie_idx : {}".format(movie_idx))
       dataset['rating'][user_idx, movie_idx] = row.rating
       dataset[k]['mask'][user_idx, movie_idx] = 1
       dataset[k]['users'].add(user_idx)
       dataset[k]['movies'].add(movie_idx)
+    print("processed {} data".format(k))
+    print("{} data shape {}".format(k, dataset[k]['mask'].shape))
+    with open('{}_data.pkl'.format(k), 'wb') as data_path:
+        pickle.dump(dataset[k], data_path, protocol=2)
+    print("dumped {} data".format(k))
+  print("write data into pkl")
 
-  return dataset
 if __name__=='__main__':
   data = load_data('dataset/ratings.csv')
   print(data)
