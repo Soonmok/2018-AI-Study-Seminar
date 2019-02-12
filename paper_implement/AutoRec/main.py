@@ -55,22 +55,13 @@ if __name__=="__main__":
     sess.run(init)
 
     def train_step(train_indices, train_values, train_shape):
-        input_mask_sp = tf.SparseTensor(indices=train_indices,
-                                        values=train_values,
-                                        dense_shape=train_shape)
-        output_mask_sp = tf.SparseTensor(indices=train_indices,
-                                        values=train_values,
-                                        dense_shape=train_shape)
-        ratings_sp = tf.SparseTensor(indices=train_indices,
-                                        values=train_values,
-                                        dense_shape=train_shape)
-        input_mask_val = input_mask_sp.eval(session=sess)
-        output_mask_val = output_mask_sp.eval(session=sess)
-        ratings_val = ratings_sp.eval(session=sess)
         one_values = np.array([1] * len(train_values))
-        feed_dict = {input_mask : input_mask_val,
-                     output_mask : output_mask_val,
-                     ratings : ratings_val}
+        feed_dict = {input_mask : tf.SparseTensorValue(
+            train_indices, one_values, train_shape),
+                     output_mask : tf.SparseTensorValue(
+            train_indices, one_values, train_shape),
+                     ratings : tf.SparseTensorValue(
+            train_indices, train_values, train_shape)}
         _, cost, step = sess.run([train_op, total_cost, global_step], feed_dict)
         return cost, step
 
