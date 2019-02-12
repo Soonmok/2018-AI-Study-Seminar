@@ -25,6 +25,7 @@ if __name__=="__main__":
     sparse_test_dataset = scipy.sparse.load_npz("./test_data.npz")
     sparse_dev_dataset = scipy.sparse.load_npz("./dev_data.npz")
 
+    # change sparse matrix into dense matrix
     ratings_data = sparse_ratings.todense()
     train_dataset = sparse_train_dataset.todense()
     test_dataset = sparse_test_dataset.todense()
@@ -59,12 +60,29 @@ if __name__=="__main__":
 
     """ -------------- model part end---------------------"""
     
+    # start session
     sess = tf.Session()
     print("initialize model")
     init = tf.global_variables_initializer()
     sess.run(init)
 
     def train_step(train_indices, train_values, train_shape):
+        """ train batches 
+        Args : 
+            train_indices : indices of values in sparse matrix batch
+            train_values : values of sparse matrix batch
+            train_shape : shape of batch sparse matrix shape
+           
+            ex) [[0, 0, 1],
+                [1, 0, 0],
+                [0, 1, 0]]  
+            --> train_indices = [(0,2), (1,0), (2,1)]
+            --> train_values = [1, 1, 1]
+            --> train_shape = (3, 3)
+        Returns :
+            cost : loss value
+            step : train step number"""
+
         one_values = np.array([1] * len(train_values))
         feed_dict = {input_mask : tf.SparseTensorValue(
             train_indices, one_values, train_shape),
@@ -76,6 +94,14 @@ if __name__=="__main__":
         return cost, step
 
     def dev_step(dev_indices, dev_values, dev_shape):
+        """ inference dev batches (not train !!)
+        Args :
+            dev_indices : indices of values in sparse matrix batch
+            dev_values : values of sparse matrix batch
+            dev_shpae : shape of batch sparse matrix shape
+        Returns :
+            cost : difference between predicted matrix and real matrix"""
+
         one_values = np.array([1] * len(dev_values))
         feed_dict = {input_mask : tf.SparseTensorValue(
             dev_indices, one_values, dev_shape),
@@ -86,6 +112,7 @@ if __name__=="__main__":
         cost = sess.run(total_cost, feed_dict)
         return cost
 
+    # training part
     for epoch in range(config.epoch):
         batches = batch_iter(ratings_data, config.batch_size)
         for batch, shape in batches:

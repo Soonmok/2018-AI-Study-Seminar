@@ -33,11 +33,9 @@ def batch_iter(dataset, batch_size):
             
 
 def load_data(file_path):
-  """ load csv file and create dataset for deep learning
+  """ load csv file and construct dataset,write dataset into sparse matrix file(.npz files)
       Args :
-        file_path : csv datafile path
-      returns:
-        dataset : shape(user_num, movie_num) matrix devided into train, test, dev set"""
+        file_path : csv datafile path """
 
   rating_data = pd.read_csv(file_path, sep='::', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
@@ -52,25 +50,6 @@ def load_data(file_path):
   num_users = rating_data.userId.nunique()
   num_movies = rating_data.movieId.nunique()
   print("users {} movies {}".format(num_users, num_movies))
-
-  dataset = {
-    'rating': np.zeros((num_users, num_movies), dtype=np.float32),
-    'train' : {
-        'mask' : np.zeros((num_users, num_movies), dtype=np.float32),
-        'users' : set(), 
-        'movies' : set()
-      },
-    'test' : {
-        'mask' : np.zeros((num_users, num_movies), dtype=np.float32),
-        'users' : set(),
-        'movies' : set()
-      },
-    'dev' : {
-        'mask' : np.zeros((num_users, num_movies), dtype=np.float32),
-        'users' : set(),
-        'movies' : set()
-      },
-    }
 
   user_idxs = {}
   movie_idxs = {}
@@ -95,6 +74,7 @@ def load_data(file_path):
       movie_idxs[movie_id] = len(movie_idxs)
     return movie_idxs[movie_id]
 
+  # change data into (num_users, num_movies) shape sparse matrix and dump it 
   total_dataset = np.zeros((num_users, num_movies))
   for indices, k in [(train_indices, 'train'), (test_indices, 'test'), (dev_indices, 'dev')]:
     dataset = np.zeros((num_users, num_movies), dtype=np.float32)
