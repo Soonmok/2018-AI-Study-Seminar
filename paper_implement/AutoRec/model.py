@@ -27,7 +27,6 @@ class AutoEncoder(object):
         X_dense_reconstructed = tf.layers.dense(
             inputs=features,
             units=recontruction_size, 
-            activation=tf.nn.selu,
             name="decode")
         with tf.variable_scope('decode', reuse=True):
                 self.w_decoder = tf.get_variable('kernel')
