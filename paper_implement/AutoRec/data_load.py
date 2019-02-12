@@ -95,35 +95,23 @@ def load_data(file_path):
       movie_idxs[movie_id] = len(movie_idxs)
     return movie_idxs[movie_id]
 
+  total_dataset = np.zeros((num_users, num_movies))
   for indices, k in [(train_indices, 'train'), (test_indices, 'test'), (dev_indices, 'dev')]:
+    dataset = np.zeros((num_users, num_movies), dtype=np.float32)
     for row in rating_data.iloc[indices].itertuples():
       user_idx = get_user_idx(row.userId)
       movie_idx = get_movie_idx(row.movieId)
-      dataset['rating'][user_idx, movie_idx] = row.rating
-      dataset[k]['mask'][user_idx, movie_idx] = 1
-      dataset[k]['users'].add(user_idx)
-      dataset[k]['movies'].add(movie_idx)
+      dataset[user_idx, movie_idx] = 1 
+      total_dataset[user_idx, movie_idx] = row.rating
     print("processed {} data".format(k))
-    print("{} data shape {}".format(k, dataset[k]['mask'].shape))
     with open('{}_data.npz'.format(k), 'wb') as data_path:
-        sparse_mat = scipy.sparse.csc_matrix(dataset[k]['mask'])
+        sparse_mat = scipy.sparse.csc_matrix(dataset)
         scipy.sparse.save_npz(data_path, sparse_mat)
     print("dumped {} data".format(k))
   print("dump rating data")
   with open('rating_data.npz', 'wb') as data_path:
-      sparse_mat = scipy.sparse.csc_matrix(dataset['rating'])
+      sparse_mat = scipy.sparse.csc_matrix(total_dataset)
       scipy.sparse.save_npz(data_path, sparse_mat)
-
-def load_sparse_data(data_path):
-  rating_data = pd.read_csv(file_path, sep=',', 
-         names=['userId', 'movieId', 'rating', 'timestamp'])
-  rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
-
-  indices = range(len(rating_data))
-  train_indices, test_indices = train_test_split(indices, shuffle=True)
-  train_indices, dev_indices = train_test_split(train_indices, test_size=0.1, shuffle=True)
-  print("loading total data{} train {} dev {} test {}".format(
-        len(indices), len(train_indices), len(dev_indices), len(test_indices)))
 
 def sparse_generator(rating_data, indices, num_movies):
   for row in rating_data.iloc[train_indices].itertuples():
