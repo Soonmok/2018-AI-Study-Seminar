@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import _pickle as pickle
 from sklearn.model_selection import train_test_split
+import scipy.sparse
 
 def batch_iter(dataset, batch_size):
     """ make batch dataset for learning 
@@ -9,13 +10,27 @@ def batch_iter(dataset, batch_size):
             dataset : dataset to divide into batch segment
             batch_size : batch_size
         returns :
-            dataset[start_idx:end_idx] : batch segments of dataset"""
+            indices_2d : non zero sparse matrix indices_2d
+            values : non zero value of sparse matrix (match to 2d_indices)
+            shape : shape of batch sparse matrix"""
 
-    for idx in range(len(dataset) / batch_size):
+    for idx in range(int(dataset.shape[0] / batch_size)):
         start_idx = idx * batch_size 
         end_idx = min((idx + 1) * batch_size, len(dataset)-1)
-        input_mask = (dataset[start_idx:end_idx] != 0).astype(np.float32)
-        yield list(zip(dataset[start_idx:end_idx], input_mask))
+        batch = dataset[start_idx:end_idx]
+        input_mask = (batch != 0).astype(np.float32)
+        indices_2d = []
+        values = ()
+        shape = (input_mask.shape[0], input_mask.shape[1])
+        for idx_row, row in enumerate(batch):
+            row = np.asarray(row)
+            row = np.squeeze(row, axis=0)
+            for idx_col, element in enumerate(row):
+                if element != 0:
+                    indices_2d.append([idx_row, idx_col])
+                    values = values + (element,)
+        yield zip(indices_2d, values), shape
+            
 
 def load_data(file_path):
   """ load csv file and create dataset for deep learning
@@ -24,7 +39,7 @@ def load_data(file_path):
       returns:
         dataset : shape(user_num, movie_num) matrix devided into train, test, dev set"""
 
-  rating_data = pd.read_csv(file_path, sep=',', 
+  rating_data = pd.read_csv(file_path, sep='::', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
   rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
 
@@ -90,10 +105,40 @@ def load_data(file_path):
       dataset[k]['movies'].add(movie_idx)
     print("processed {} data".format(k))
     print("{} data shape {}".format(k, dataset[k]['mask'].shape))
-    with open('{}_data.pkl'.format(k), 'wb') as data_path:
-        pickle.dump(dataset[k], data_path, protocol=2)
+    with open('{}_data.npz'.format(k), 'wb') as data_path:
+        sparse_mat = scipy.sparse.csc_matrix(dataset[k]['mask'])
+        scipy.sparse.save_npz(data_path, sparse_mat)
     print("dumped {} data".format(k))
-  print("write data into pkl")
+  print("dump rating data")
+  with open('rating_data.npz', 'wb') as data_path:
+      sparse_mat = scipy.sparse.csc_matrix(dataset['rating'])
+      scipy.sparse.save_npz(data_path, sparse_mat)
+
+def load_sparse_data(data_path):
+  rating_data = pd.read_csv(file_path, sep=',', 
+         names=['userId', 'movieId', 'rating', 'timestamp'])
+  rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
+
+  indices = range(len(rating_data))
+  train_indices, test_indices = train_test_split(indices, shuffle=True)
+  train_indices, dev_indices = train_test_split(train_indices, test_size=0.1, shuffle=True)
+  print("loading total data{} train {} dev {} test {}".format(
+        len(indices), len(train_indices), len(dev_indices), len(test_indices)))
+
+def sparse_generator(rating_data, indices, num_movies):
+  for row in rating_data.iloc[train_indices].itertuples():
+      user_idx = get_user_idx(row.userId)
+      movie_idx = get_movie_idx(row.movieId)
+      indices_2d = (user_idx, movie_idx)
+      value = (row.rating, )
+      shape = (1, num_movies)
+      yield (indices_2d, value, shape) 
+
+def get_dataset():
+    dataset = tf.data.Dataset.from_generator(sparse_generator, (tf.int64, tf.float32, tf.int64))
+    dataset = dataset.map(lambda i, v, s: tf.SparseTensor(i, v, s))
+    return dataset
+
 
 if __name__=='__main__':
   data = load_data('dataset/ratings.csv')
