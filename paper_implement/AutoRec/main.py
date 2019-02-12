@@ -135,6 +135,7 @@ if __name__=="__main__":
             test_cost += dev_step(
                     test_indices_2d, test_values, test_shape)
             counter += 1
+        print("=============================================")
         print("epoch : {}, test MSE score == {}".format(
             epoch, test_cost/counter))
 
