@@ -3,12 +3,9 @@ import numpy as np
 
 
 class AutoEncoder(object):
-    def __init__(self, X, hidden_size):
-        X_dense = tf.sparse.to_dense(X)
+    def __init__(self, X_dense, hidden_size):
         features = self.encode(X_dense, hidden_size)
-        X_dense_reconstructed = self.decode(features, X_dense.shape[1])
-        self.rating_recontructed = X_dense_reconstructed
-        self.features = features
+        self.X_dense_reconstructed = self.decode(features, X_dense.shape[1])
  
     def encode(self, x_input, hidden_size):
         layer_1 = tf.layers.dropout(

@@ -35,12 +35,13 @@ if __name__=="__main__":
     global_step = tf.Variable(0, name="global_step")
 
     # make input match into train/test/dev dataset
-    model = AutoEncoder(ratings, config.hidden_size)
+    X_dense = tf.multiply(tf.sparse.to_dense(input_mask),
+                          tf.sparse.to_dense(ratings))
+    model = AutoEncoder(X_dense, config.hidden_size)
 
     reconstrunction_cost = tf.losses.mean_squared_error(
-        tf.multiply( 
-            tf.sparse.to_dense(ratings), tf.sparse.to_dense(output_mask)), 
-        model.rating_recontructed)
+       tf.multiply(model.X_dense_reconstructed, tf.sparse.to_dense(output_mask)), 
+       tf.sparse.to_dense(ratings))
     reg_cost = tf.reduce_sum(model.w_encoder ** 2) + tf.reduce_sum(model.w_decoder ** 2)
     total_cost = reconstrunction_cost + 0.5 * reg_cost * config.penalty 
     train_op = tf.train.AdamOptimizer(
