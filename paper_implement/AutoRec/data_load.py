@@ -39,15 +39,14 @@ def load_data(file_path):
       Args :
         file_path : csv datafile path """
 
-  rating_data = pd.read_csv(file_path, sep=',', 
+  rating_data = pd.read_csv(file_path, sep='::', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
   rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
 
   indices = range(len(rating_data))
   train_indices, test_indices = train_test_split(indices, shuffle=True)
-  train_indices, dev_indices = train_test_split(train_indices, test_size=0.1, shuffle=True)
-  print("loading total data{} train {} dev {} test {}".format(
-        len(indices), len(train_indices), len(dev_indices), len(test_indices)))
+  print("loading total data{} train {} test {}".format(
+        len(indices), len(train_indices), len(test_indices)))
 
   num_users = rating_data.userId.nunique()
   num_movies = rating_data.movieId.nunique()
@@ -78,7 +77,7 @@ def load_data(file_path):
 
   # change data into (num_users, num_movies) shape sparse matrix and dump it 
   total_sparse_row, total_sparse_col, total_sparse_val = [], [], []
-  for indices, k in [(train_indices, 'train'), (test_indices, 'test'), (dev_indices, 'dev')]:
+  for indices, k in [(train_indices, 'train'), (test_indices, 'test')]: 
     sparse_row, sparse_col, sparse_val = [], [], []
     for row in rating_data.iloc[indices].itertuples():
       user_idx = get_user_idx(row.userId)
@@ -115,14 +114,30 @@ def get_sparse_matrix(numpy_array):
                 values = values + (element,)
     return indices_2d, values
 
-def sparse_generator(sparse_matrix):
-    for element in sparse_matrix:
-        row = np.asarray(element.todense())[0]
-        yield row 
+def sparse_generator(sparse_rating, sparse_matrix):
+    for rating_row, matrix_row in zip(sparse_rating, sparse_matrix):
+        rating_row = np.asarray(rating_row.todense())[0]
+        matrix_row = np.asarray(matrix_row.todense())[0]
+        yield (rating_row, matrix_row) 
 
-def get_dataset(sparse_matrix, batch_size):
+def sparse_test_generator(sparse_rating, sparse_train, sparse_matrix):
+    for rating_row, train_row, matrix_row in zip(sparse_rating, sparse_train, sparse_matrix):
+        rating_row = np.asarray(rating_row.todense())[0]
+        train_row = np.asarray(train_row.todense())[0]
+        matrix_row = np.asarray(matrix_row.todense())[0]
+        yield (rating_row, train_row, matrix_row)
+
+def get_dataset(sparse_rating, sparse_matrix, batch_size):
     dataset = tf.data.Dataset.from_generator(
-        lambda: sparse_generator(sparse_matrix), tf.float32)
+        lambda: sparse_generator( sparse_rating, sparse_matrix), 
+        (tf.float32, tf.float32))
+    return dataset.batch(batch_size).repeat()
+
+def get_test_dataset(sparse_rating, sparse_train, sparse_matrix, batch_size):
+    dataset = tf.data.Dataset.from_generator(
+        lambda: sparse_test_generator(
+            sparse_rating, sparse_train, sparse_matrix), 
+        (tf.float32, tf.float32, tf.float32))
     return dataset.batch(batch_size).repeat()
 
 

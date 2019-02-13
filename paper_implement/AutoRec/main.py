@@ -6,6 +6,7 @@ from data_load import load_data, batch_iter, get_dataset, get_sparse_matrix
 import _pickle as pickle
 import os
 import scipy.sparse
+from tqdm import tqdm
 
 if __name__=="__main__":
     # setting hyper parameters
@@ -19,11 +20,10 @@ if __name__=="__main__":
 
     # load data
     if not os.path.exists("./rating_data.npz"):
-        load_data('./dataset/ratings.csv')
+        load_data('./ml-1m/ratings.dat')
     sparse_total_dataset = scipy.sparse.load_npz("./rating_data.npz")
     sparse_train_dataset = scipy.sparse.load_npz("./train_data.npz")
     sparse_test_dataset = scipy.sparse.load_npz("./test_data.npz")
-    sparse_dev_dataset = scipy.sparse.load_npz("./dev_data.npz")
     num_users = sparse_total_dataset.get_shape()[0]
     num_movies = sparse_total_dataset.get_shape()[1]
     print("model construction")
@@ -38,7 +38,7 @@ if __name__=="__main__":
         tf.float32, shape=np.array([config.batch_size, num_movies], dtype=np.int64))
     global_step = tf.Variable(0, name="global_step")
 
-    # make input match into train/test/dev dataset
+    # make input match into train/test dataset
     X_dense = tf.multiply(tf.sparse.to_dense(input_mask),
                           tf.sparse.to_dense(ratings))
     model = AutoEncoder(X_dense, config.hidden_size)
@@ -61,26 +61,19 @@ if __name__=="__main__":
     sess.run(init)
 
     # get tensorflow dataset_from_generator
-    rating_dataset = get_dataset(
-        sparse_total_dataset, batch_size = config.batch_size)
     train_dataset = get_dataset(
-        sparse_train_dataset, batch_size = config.batch_size)
-    dev_dataset = get_dataset(
-        sparse_dev_dataset, batch_size = config.batch_size)
-    test_dataset = get_dataset(
+        sparse_total_dataset, sparse_train_dataset, batch_size = config.batch_size)
+    test_dataset = get_test_dataset(
+        sparse_total_dataset, sparse_train_dataset,
         sparse_test_dataset, batch_size = config.batch_size)
 
-    rating_iterator = rating_dataset.make_one_shot_iterator()
     train_iterator = train_dataset.make_one_shot_iterator()
-    dev_iterator = dev_dataset.make_one_shot_iterator()
     test_iterator = test_dataset.make_one_shot_iterator()
 
-    rating_batch_tf = rating_iterator.get_next()
     train_batch_tf = train_iterator.get_next()
-    dev_batch_tf = dev_iterator.get_next() 
     test_batch_tf = test_iterator.get_next()
 
-    def train_step(rating_batch_tf, train_batch_tf, dev_batch_tf, test_batch_tf):
+    def train_step(train_batch_tf):
         """ train batches 
         Args : 
             train_indices : indices of values in sparse matrix batch
@@ -97,9 +90,8 @@ if __name__=="__main__":
             cost : loss value
             step : train step number"""
         
-        rating_val, train_val, _, _ = sess.run([
-            rating_batch_tf, train_batch_tf, dev_batch_tf, test_batch_tf])
-
+        output = sess.run(train_batch_tf)
+        rating_val, train_val = output[0], output[1]
         rating_indices_2d, rating_values = get_sparse_matrix(rating_val)
         train_indices_2d, one_values = get_sparse_matrix(train_val)
 
@@ -113,65 +105,57 @@ if __name__=="__main__":
         _, cost, step = sess.run([train_op, total_cost, global_step], feed_dict)
         return cost, step
 
-    def dev_step(rating_batch_tf, train_batch_tf, dev_batch_tf, test_batch_tf):
-        """ inference dev batches (not train !!)
-        Args :
-            dev_indices : indices of values in sparse matrix batch
-            dev_values : values of sparse matrix batch
-            dev_shpae : shape of batch sparse matrix shape
-        Returns :
-            cost : difference between predicted matrix and real matrix"""
+    def _test_step(test_batch_tf):
 
-        rating_val, train_val, dev_val, _ = sess.run([
-            rating_batch_tf, train_batch_tf, dev_batch_tf, test_batch_tf]) 
+        output = sess.run(test_batch_tf) 
+        rating_val, train_val, test_val = output[0], output[1], output[2]
 
         rating_indices_2d, rating_values = get_sparse_matrix(rating_val) 
         train_indices_2d, train_values = get_sparse_matrix(train_val)
-        dev_indices_2d, dev_values = get_sparse_matrix(dev_val) 
+        test_indices_2d, test_values = get_sparse_matrix(test_val) 
 
         feed_dict = {input_mask : tf.SparseTensorValue(
-            train_indices_2d, train_values, dev_val.shape),
+            train_indices_2d, train_values, test_val.shape),
                     output_mask : tf.SparseTensorValue(
-            dev_indices_2d, dev_values, dev_val.shape),
+            test_indices_2d, test_values, test_val.shape),
                     ratings : tf.SparseTensorValue(
-            rating_indices_2d, rating_values, dev_val.shape)}
+            rating_indices_2d, rating_values, test_val.shape)}
 
         cost = sess.run(total_cost, feed_dict)
         return cost
 
+    def test_step(test_batch_tf):
+        total_test_cost = 0
+        counter = 0
+        print("Testing model ...")
+        pbar = tqdm(total=num_users/config.batch_size)
+        while counter < int(num_users/config.batch_size-1):
+            try:
+                counter += 1
+                total_test_cost += _test_step(test_batch_tf) 
+                pbar.update(1)
+            except tf.errors.InvalidArgumentError:
+                break
+        return int(total_test_cost / counter)
+
     # training part
+    epoch = 1
     while True:
         try:
-            train_cost, step_num = train_step(
-                rating_batch_tf, train_batch_tf, dev_batch_tf, test_batch_tf)
+            train_cost, step_num = train_step(train_batch_tf)
             print("step : {}, cost : {}".format(step_num, train_cost))
-            if step_num % 20 == 0:
-                dev_cost = dev_step(
-                    rating_batch_tf, train_batch_tf, 
-                    dev_batch_tf, test_batch_tf)
-                print("Dev cost == > {}".format(dev_cost))
-        except tf.errors.OutOfRangeError:
-            print("finish train")
-            break    
-#            if step_num % 20 == 0:
-#                dev_batches = batch_iter(dev_dataset, config.batch_size)
-#                dev_cost, counter = 0, 0
-#                for dev_batch, dev_shape in dev_batches:
-#                    dev_indices_2d, dev_values = zip(*dev_batch)
-#                    dev_cost += dev_step(
-#                        dev_indices_2d, dev_values, dev_shape)
-#                    counter += 1
-#                print("dev MSE : {})".format(dev_cost/counter))
-#        test_batches = batch_iter(test_dataset, config.batch_size)
-#        test_cost, counter = 0, 0
-#        for test_batch, test_shape in test_batches:
-#            test_indices_2d, test_values = zip(*test_batch)
-#            test_cost += dev_step(
-#                    test_indices_2d, test_values, test_shape)
-#            counter += 1
-#        print("=============================================")
-#        print("epoch : {}, test MSE score == {}".format(
-#            epoch, test_cost/counter))
+            if step_num % (num_users/config.batch_size-1) == 0:
+                test_cost = test_step(test_batch_tf)
+                print("Test cost == > {}".format(test_cost))
+        except tf.errors.InvalidArgumentError:
+            test_cost = test_step(test_batch_tf)
+            print("{} epoch Test cost == > {}".format(epoch, test_cost))
+            epoch += 1
+            if epoch < config.batch_size:
+                pass
+            else:
+                print("Finish")
+                break
 
 
 
