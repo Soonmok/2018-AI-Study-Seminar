@@ -9,6 +9,7 @@ Requirements
 `nvidia-docker`
 
 docker image name = soonmok/autorec:small_data
+
 docker image name = soonmok/autorec:big_data
 
 실행방법 (nvidia docker 이용)
