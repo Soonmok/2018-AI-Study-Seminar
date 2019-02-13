@@ -8,6 +8,13 @@ Requirements
 
 `nvidia-docker`
 
+or 
+
+`tensorflow-gpu`
+`pandas`
+`scikit-learn`
+`tqdm`
+
 docker image name = soonmok/autorec:small_data
 
 docker image name = soonmok/autorec:big_data
