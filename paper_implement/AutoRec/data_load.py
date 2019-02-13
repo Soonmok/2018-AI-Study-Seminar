@@ -3,6 +3,8 @@ import pandas as pd
 import _pickle as pickle
 from sklearn.model_selection import train_test_split
 import scipy.sparse
+from scipy.sparse import coo_matrix
+import tensorflow as tf
 
 def batch_iter(dataset, batch_size):
     """ make batch dataset for learning 
@@ -37,7 +39,7 @@ def load_data(file_path):
       Args :
         file_path : csv datafile path """
 
-  rating_data = pd.read_csv(file_path, sep='::', 
+  rating_data = pd.read_csv(file_path, sep=',', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
   rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
 
@@ -75,37 +77,53 @@ def load_data(file_path):
     return movie_idxs[movie_id]
 
   # change data into (num_users, num_movies) shape sparse matrix and dump it 
-  total_dataset = np.zeros((num_users, num_movies))
+  total_sparse_row, total_sparse_col, total_sparse_val = [], [], []
   for indices, k in [(train_indices, 'train'), (test_indices, 'test'), (dev_indices, 'dev')]:
-    dataset = np.zeros((num_users, num_movies), dtype=np.float32)
+    sparse_row, sparse_col, sparse_val = [], [], []
     for row in rating_data.iloc[indices].itertuples():
       user_idx = get_user_idx(row.userId)
       movie_idx = get_movie_idx(row.movieId)
-      dataset[user_idx, movie_idx] = 1 
-      total_dataset[user_idx, movie_idx] = row.rating
+      sparse_row.append(user_idx)
+      sparse_col.append(movie_idx)
+      sparse_val.append(1)
+      total_sparse_row.append(user_idx)
+      total_sparse_col.append(movie_idx)
+      total_sparse_val.append(row.rating)
     print("processed {} data".format(k))
     with open('{}_data.npz'.format(k), 'wb') as data_path:
+        dataset = coo_matrix(
+          (sparse_val, (sparse_row, sparse_col)), 
+          shape=(num_users, num_movies))
         sparse_mat = scipy.sparse.csc_matrix(dataset)
         scipy.sparse.save_npz(data_path, sparse_mat)
     print("dumped {} data".format(k))
   print("dump rating data")
   with open('rating_data.npz', 'wb') as data_path:
+      total_dataset = coo_matrix(
+          (total_sparse_val, (total_sparse_row, total_sparse_col)), 
+          shape=(num_users, num_movies))
       sparse_mat = scipy.sparse.csc_matrix(total_dataset)
       scipy.sparse.save_npz(data_path, sparse_mat)
 
-def sparse_generator(rating_data, indices, num_movies):
-  for row in rating_data.iloc[train_indices].itertuples():
-      user_idx = get_user_idx(row.userId)
-      movie_idx = get_movie_idx(row.movieId)
-      indices_2d = (user_idx, movie_idx)
-      value = (row.rating, )
-      shape = (1, num_movies)
-      yield (indices_2d, value, shape) 
+def get_sparse_matrix(numpy_array):
+    indices_2d = []
+    values = ()
+    for idx_row, row in enumerate(numpy_array):
+        for idx_col, element in enumerate(row):
+            if element != 0:
+                indices_2d.append([idx_row, idx_col])
+                values = values + (element,)
+    return indices_2d, values
 
-def get_dataset():
-    dataset = tf.data.Dataset.from_generator(sparse_generator, (tf.int64, tf.float32, tf.int64))
-    dataset = dataset.map(lambda i, v, s: tf.SparseTensor(i, v, s))
-    return dataset
+def sparse_generator(sparse_matrix):
+    for element in sparse_matrix:
+        row = np.asarray(element.todense())[0]
+        yield row 
+
+def get_dataset(sparse_matrix, batch_size):
+    dataset = tf.data.Dataset.from_generator(
+        lambda: sparse_generator(sparse_matrix), tf.float32)
+    return dataset.batch(batch_size).repeat()
 
 
 if __name__=='__main__':
