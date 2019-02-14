@@ -2,7 +2,7 @@ from model import AutoEncoder
 from data_load import *
 import tensorflow as tf
 import argparse
-from data_load import load_data, batch_iter, get_dataset, get_sparse_matrix
+from data_load import load_data, get_train_dataset, get_sparse_matrix
 import _pickle as pickle
 import os
 import scipy.sparse
@@ -62,7 +62,7 @@ if __name__=="__main__":
     sess.run(init)
 
     # get tf.dataset_from_generator
-    train_dataset = get_dataset(
+    train_dataset = get_train_dataset(
         sparse_total_dataset, sparse_train_dataset, batch_size = config.batch_size)
     test_dataset = get_test_dataset(
         sparse_total_dataset, sparse_train_dataset,

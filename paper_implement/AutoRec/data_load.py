@@ -104,10 +104,10 @@ def sparse_train_generator(sparse_rating, sparse_train):
         train_row : np array row of train mask 
         ex) [1, 0, 0, 0, 1]""" 
 
-    for rating_row, train_row in zip(sparse_rating, sparse_matrix):
+    for rating_row, train_row in zip(sparse_rating, sparse_train):
         rating_row = np.asarray(rating_row.todense())[0]
-        matrix_row = np.asarray(matrix_row.todense())[0]
-        yield (rating_row, matrix_row) 
+        train_row = np.asarray(train_row.todense())[0]
+        yield (rating_row, train_row) 
 
 def sparse_test_generator(sparse_rating, sparse_train, sparse_test):
     """ generator to convert sparse matrix into np array for testing
@@ -126,13 +126,13 @@ def sparse_test_generator(sparse_rating, sparse_train, sparse_test):
     for rating_row, train_row, matrix_row in zip(sparse_rating, sparse_train, sparse_matrix):
         rating_row = np.asarray(rating_row.todense())[0]
         train_row = np.asarray(train_row.todense())[0]
-        matrix_row = np.asarray(matrix_row.todense())[0]
-        yield (rating_row, train_row, matrix_row)
+        test_row = np.asarray(test_row.todense())[0]
+        yield (rating_row, train_row, test_row)
 
-def get_dataset(sparse_rating, sparse_matrix, batch_size):
+def get_train_dataset(sparse_rating, sparse_matrix, batch_size):
     """ get tensorflow dataset for training"""
     dataset = tf.data.Dataset.from_generator(
-        lambda: sparse_generator( sparse_rating, sparse_matrix), 
+        lambda: sparse_train_generator( sparse_rating, sparse_matrix), 
         (tf.float32, tf.float32))
     return dataset.batch(batch_size).repeat()
 
