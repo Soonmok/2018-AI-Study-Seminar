@@ -4,4 +4,4 @@ run pip install -r requirements.txt
 RUN mkdir app
 WORKDIR /app
 ADD . /app
-RUN python main.py
+RUN cd /app
