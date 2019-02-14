@@ -11,7 +11,7 @@ from tqdm import tqdm
 if __name__=="__main__":
     # setting hyper parameters
     args = argparse.ArgumentParser()
-    args.add_argument('--data_path', type=str, default='./ml-1m/ratings.dat')
+    args.add_argument('--data_path', type=str, default='./ml-latest-small/ratings.csv')
     args.add_argument('--batch_size', type=int, default=32)
     args.add_argument('--hidden_size', type=int, default=500)
     args.add_argument('--penalty', type=float, default=0.001)

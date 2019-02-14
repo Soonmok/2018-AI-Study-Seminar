@@ -11,7 +11,7 @@ def load_data(file_path):
       Args :
         file_path : csv datafile path """
 
-  rating_data = pd.read_csv(file_path, sep='::', 
+  rating_data = pd.read_csv(file_path, sep=',', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
   rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
 
