@@ -32,15 +32,15 @@ wget http://files.grouplens.org/datasets/movielens/ml-latest-small.zip (작은 �
 
 wget http://files.grouplens.org/datasets/movielens/ml-latest.zip (큰 데이터셋 약 200MB)
 
-docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest  (작은 데이터셋)
+docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (작은 데이터셋)
 
 python main.py --data_path=./ml-1m/ratings.dat
 
-docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest  (큰 데이터셋)
+docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (큰 데이터셋)
+
 
 python main.py --data_path=./ml-latest/ratings.csv
 ```
-
 
 
 실행방법 (local 환경세팅)
