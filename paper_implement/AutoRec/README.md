@@ -15,9 +15,10 @@ or
 `scikit-learn`
 `tqdm`
 
-docker image name = soonmok/autorec:small_data
+docker image name = soonmok/autorec:latest
 
-docker image name = soonmok/autorec:big_data
+docker pull soonmok/autorec:latest
+
 
 실행방법 (nvidia docker 이용)
 
