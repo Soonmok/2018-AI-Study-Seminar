@@ -30,7 +30,11 @@ cd 2018-AI-Study-Seminar/paper_implement/AutoRec
 
 wget http://files.grouplens.org/datasets/movielens/ml-latest-small.zip (작은 데이터셋 1MB)
 
+unzip ml-latest-small.zip
+
 wget http://files.grouplens.org/datasets/movielens/ml-latest.zip (큰 데이터셋 약 200MB)
+
+unzip ml-latest.zip
 
 docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (작은 데이터셋)
 
