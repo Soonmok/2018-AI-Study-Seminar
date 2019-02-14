@@ -6,34 +6,6 @@ import scipy.sparse
 from scipy.sparse import coo_matrix
 import tensorflow as tf
 
-def batch_iter(dataset, batch_size):
-    """ make batch dataset for learning 
-        Args :
-            dataset : dataset to divide into batch segment
-            batch_size : batch_size
-        returns :
-            indices_2d : non zero sparse matrix indices_2d
-            values : non zero value of sparse matrix (match to 2d_indices)
-            shape : shape of batch sparse matrix"""
-
-    for idx in range(int(dataset.shape[0] / batch_size)):
-        start_idx = idx * batch_size 
-        end_idx = min((idx + 1) * batch_size, len(dataset)-1)
-        batch = dataset[start_idx:end_idx]
-        input_mask = (batch != 0).astype(np.float32)
-        indices_2d = []
-        values = ()
-        shape = (input_mask.shape[0], input_mask.shape[1])
-        for idx_row, row in enumerate(batch):
-            row = np.asarray(row)
-            row = np.squeeze(row, axis=0)
-            for idx_col, element in enumerate(row):
-                if element != 0:
-                    indices_2d.append([idx_row, idx_col])
-                    values = values + (element,)
-        yield zip(indices_2d, values), shape
-            
-
 def load_data(file_path):
   """ load csv file and construct dataset,write dataset into sparse matrix file(.npz files)
       Args :
@@ -105,6 +77,13 @@ def load_data(file_path):
       scipy.sparse.save_npz(data_path, sparse_mat)
 
 def get_sparse_matrix(numpy_array):
+    """ convert numpy array into sparse matrix
+    Args : 
+        numpy_array: np array to convert
+    Returns :
+        indices_2d: indices where sparse matrix has nonzero value
+        values :nonzero value list"""
+
     indices_2d = []
     values = ()
     for idx_row, row in enumerate(numpy_array):
@@ -114,13 +93,36 @@ def get_sparse_matrix(numpy_array):
                 values = values + (element,)
     return indices_2d, values
 
-def sparse_generator(sparse_rating, sparse_matrix):
-    for rating_row, matrix_row in zip(sparse_rating, sparse_matrix):
+def sparse_train_generator(sparse_rating, sparse_train):
+    """ generator to convert sparse matrix into np array for training
+    Args : 
+        sparse_rating: rating sparse matrix to convert (scipy csc matrix type)
+        sparse_train: train sparse matrix to convert (scipy csc matrix type)
+    Returns :
+        rating_row : np array row of rating values
+        ex) [4, 2, 0, 0, 1]
+        train_row : np array row of train mask 
+        ex) [1, 0, 0, 0, 1]""" 
+
+    for rating_row, train_row in zip(sparse_rating, sparse_matrix):
         rating_row = np.asarray(rating_row.todense())[0]
         matrix_row = np.asarray(matrix_row.todense())[0]
         yield (rating_row, matrix_row) 
 
-def sparse_test_generator(sparse_rating, sparse_train, sparse_matrix):
+def sparse_test_generator(sparse_rating, sparse_train, sparse_test):
+    """ generator to convert sparse matrix into np array for testing
+    Args :
+        sparse_rating: rating sparse matrix to convert (scipy csc matrix type)
+        sparse_train: train sparse matrix to convert (scipy csc matrix type)
+        sparse_test: test sparse matrix to convert (scipy csc matrix type)
+    Returns :
+        rating_row : np array row of rating values
+        ex) [4, 2, 0, 0, 1]
+        train_row : np array row of train mask 
+        ex) [1, 0, 0, 0, 1]
+        test_row : np.array row of test mask
+        ex) [0, 1, 0, 0, 1]""" 
+
     for rating_row, train_row, matrix_row in zip(sparse_rating, sparse_train, sparse_matrix):
         rating_row = np.asarray(rating_row.todense())[0]
         train_row = np.asarray(train_row.todense())[0]
@@ -128,12 +130,14 @@ def sparse_test_generator(sparse_rating, sparse_train, sparse_matrix):
         yield (rating_row, train_row, matrix_row)
 
 def get_dataset(sparse_rating, sparse_matrix, batch_size):
+    """ get tensorflow dataset for training"""
     dataset = tf.data.Dataset.from_generator(
         lambda: sparse_generator( sparse_rating, sparse_matrix), 
         (tf.float32, tf.float32))
     return dataset.batch(batch_size).repeat()
 
 def get_test_dataset(sparse_rating, sparse_train, sparse_matrix, batch_size):
+    """ get tensorflow dataset for testing"""
     dataset = tf.data.Dataset.from_generator(
         lambda: sparse_test_generator(
             sparse_rating, sparse_train, sparse_matrix), 

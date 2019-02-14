@@ -3,3 +3,5 @@ COPY requirements.txt requirements.txt
 run pip install -r requirements.txt
 RUN mkdir app
 WORKDIR /app
+ADD . /app
+RUN python main.py

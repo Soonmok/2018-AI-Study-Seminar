@@ -11,6 +11,7 @@ from tqdm import tqdm
 if __name__=="__main__":
     # setting hyper parameters
     args = argparse.ArgumentParser()
+    args.add_argument('--data_path', type=str, default='./ml-1m/ratings.dat')
     args.add_argument('--batch_size', type=int, default=32)
     args.add_argument('--hidden_size', type=int, default=500)
     args.add_argument('--penalty', type=float, default=0.001)
@@ -60,7 +61,7 @@ if __name__=="__main__":
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    # get tensorflow dataset_from_generator
+    # get tf.dataset_from_generator
     train_dataset = get_dataset(
         sparse_total_dataset, sparse_train_dataset, batch_size = config.batch_size)
     test_dataset = get_test_dataset(
@@ -76,16 +77,8 @@ if __name__=="__main__":
     def train_step(train_batch_tf):
         """ train batches 
         Args : 
-            train_indices : indices of values in sparse matrix batch
-            train_values : values of sparse matrix batch
-            train_shape : shape of batch sparse matrix shape
-           
-            ex) [[0, 0, 1],
-                [1, 0, 0],
-                [0, 1, 0]]  
-            --> train_indices = [(0,2), (1,0), (2,1)]
-            --> train_values = [1, 1, 1]
-            --> train_shape = (3, 3)
+            train_batch_tf: batch of tf train data (rating_row, train_row))
+            ex) ([2, 0, 0, 1 ...], [1, 0, 0, 1 ...])
         Returns :
             cost : loss value
             step : train step number"""
@@ -106,6 +99,12 @@ if __name__=="__main__":
         return cost, step
 
     def _test_step(test_batch_tf):
+        """helper function of test step
+        Args : 
+            test_batch_tf: batch of tf test data (rating_row, test_row)
+            ex) ([2, 0, 0, 1 ...], [1, 0, 0, 0 ...])
+        Returns :
+            cost : loss value of test batch data"""
 
         output = sess.run(test_batch_tf) 
         rating_val, train_val, test_val = output[0], output[1], output[2]
@@ -125,6 +124,12 @@ if __name__=="__main__":
         return cost
 
     def test_step(test_batch_tf):
+        """test step
+        Args : 
+            test_batch_tf : batch of tf test data (rating_row, test_row)
+            ex) ([2, 0, 0, 1 ...], [1, 0, 0, 0 ...])
+        Returns :
+            cost : mean loss of total test data"""
         total_test_cost = 0
         counter = 0
         print("Testing model ...")
@@ -136,7 +141,7 @@ if __name__=="__main__":
                 pbar.update(1)
             except tf.errors.InvalidArgumentError:
                 break
-        return int(total_test_cost / counter)
+        return total_test_cost / counter
 
     # training part
     epoch = 1
@@ -146,6 +151,7 @@ if __name__=="__main__":
             print("step : {}, cost : {}".format(step_num, train_cost))
             if step_num % (num_users/config.batch_size-1) == 0:
                 test_cost = test_step(test_batch_tf)
+                print("=====================================")
                 print("Test cost == > {}".format(test_cost))
         except tf.errors.InvalidArgumentError:
             test_cost = test_step(test_batch_tf)
