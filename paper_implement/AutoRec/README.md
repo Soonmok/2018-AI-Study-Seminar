@@ -51,4 +51,4 @@ python main.py --data_dir=ml-latest
 
 ```pip install requirements.txt
 
- python main.py --data_path=./ml-1m/ratings.dat
+ python main.py --data_dir=ml-small-latest
