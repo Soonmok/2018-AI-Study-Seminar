@@ -49,6 +49,7 @@ python main.py --data_dir=ml-latest
 
 실행방법 (local 환경세팅)
 
-```pip install requirements.txt
+```
+pip3 install requirements.txt
 
- python main.py --data_dir=ml-small-latest
+python main.py --data_dir=ml-small-latest ```
