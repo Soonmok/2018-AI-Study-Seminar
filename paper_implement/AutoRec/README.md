@@ -38,12 +38,12 @@ unzip ml-latest.zip
 
 docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (작은 데이터셋)
 
-python main.py --data_path=./ml-1m/ratings.dat
+python main.py --data_dir=ml-small-latest
 
 docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (큰 데이터셋)
 
 
-python main.py --data_path=./ml-latest/ratings.csv
+python main.py --data_dir=ml-latest
 ```
 
 
