@@ -6,12 +6,12 @@ import scipy.sparse
 from scipy.sparse import coo_matrix
 import tensorflow as tf
 
-def load_data(file_path):
+def load_data(data_dir):
   """ load csv file and construct dataset,write dataset into sparse matrix file(.npz files)
       Args :
         file_path : csv datafile path """
 
-  rating_data = pd.read_csv(file_path, sep=',', 
+  rating_data = pd.read_csv(data_dir + '/ratings.csv', sep=',', 
          names=['userId', 'movieId', 'rating', 'timestamp'])
   rating_data.rating = rating_data.rating.apply(pd.to_numeric, errors='coerce')
 
@@ -61,7 +61,7 @@ def load_data(file_path):
       total_sparse_col.append(movie_idx)
       total_sparse_val.append(row.rating)
     print("processed {} data".format(k))
-    with open('{}_data.npz'.format(k), 'wb') as data_path:
+    with open(data_dir + '/{}_data.npz'.format(k), 'wb') as data_path:
         dataset = coo_matrix(
           (sparse_val, (sparse_row, sparse_col)), 
           shape=(num_users, num_movies))
@@ -69,7 +69,7 @@ def load_data(file_path):
         scipy.sparse.save_npz(data_path, sparse_mat)
     print("dumped {} data".format(k))
   print("dump rating data")
-  with open('rating_data.npz', 'wb') as data_path:
+  with open(data_dir + '/rating_data.npz', 'wb') as data_path:
       total_dataset = coo_matrix(
           (total_sparse_val, (total_sparse_row, total_sparse_col)), 
           shape=(num_users, num_movies))

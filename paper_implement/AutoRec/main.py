@@ -11,7 +11,7 @@ from tqdm import tqdm
 if __name__=="__main__":
     # setting hyper parameters
     args = argparse.ArgumentParser()
-    args.add_argument('--data_path', type=str, default='./ml-latest-small/ratings.csv')
+    args.add_argument('--data_dir', type=str, default='./ml-latest-small')
     args.add_argument('--batch_size', type=int, default=32)
     args.add_argument('--hidden_size', type=int, default=500)
     args.add_argument('--penalty', type=float, default=0.001)
@@ -20,11 +20,11 @@ if __name__=="__main__":
     config = args.parse_args()
 
     # load data
-    if not os.path.exists("./rating_data.npz"):
-        load_data('./ml-1m/ratings.dat')
-    sparse_total_dataset = scipy.sparse.load_npz("./rating_data.npz")
-    sparse_train_dataset = scipy.sparse.load_npz("./train_data.npz")
-    sparse_test_dataset = scipy.sparse.load_npz("./test_data.npz")
+    if not os.path.exists(config.data_dir + "/rating_data.npz"):
+        load_data(config.data_dir)
+    sparse_total_dataset = scipy.sparse.load_npz(config.data_dir + "/rating_data.npz")
+    sparse_train_dataset = scipy.sparse.load_npz(config.data_dir + "/train_data.npz")
+    sparse_test_dataset = scipy.sparse.load_npz(config.data_dir + "/test_data.npz")
     num_users = sparse_total_dataset.get_shape()[0]
     num_movies = sparse_total_dataset.get_shape()[1]
     print("model construction")

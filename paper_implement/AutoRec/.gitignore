@@ -1,4 +1,5 @@
 dataset
-ml-latest-small
+ml-latest-small*
+ml-latest*
 *.npz
 __pycache__
