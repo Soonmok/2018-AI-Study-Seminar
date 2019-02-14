@@ -17,12 +17,11 @@ or
 
 docker image name = soonmok/autorec:latest
 
-docker pull soonmok/autorec:latest
-
 
 실행방법 (nvidia docker 이용)
 
-```docker pull soonmok/autorec:latest
+```
+docker pull soonmok/autorec:latest
 
 git clone https://github.com/Soonmok/2018-AI-Study-Seminar.git
 
@@ -51,5 +50,13 @@ python main.py --data_dir=ml-latest
 
 ```
 pip3 install requirements.txt
+
+wget http://files.grouplens.org/datasets/movielens/ml-latest-small.zip (작은 데이터셋 1MB)
+
+unzip ml-latest-small.zip
+
+wget http://files.grouplens.org/datasets/movielens/ml-latest.zip (큰 데이터셋 약 200MB)
+
+unzip ml-latest.zip
 
 python main.py --data_dir=ml-small-latest ```
