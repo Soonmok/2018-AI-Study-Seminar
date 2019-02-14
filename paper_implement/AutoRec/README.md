@@ -34,17 +34,13 @@ wget http://files.grouplens.org/datasets/movielens/ml-latest.zip (큰 데이터�
 
 docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (작은 데이터셋)
 
-cd /app
-
 python main.py --data_path=./ml-1m/ratings.dat
 
 docker run -it --runtime=nvidia -v $PWD:/app soonmok/autorec:latest bash (큰 데이터셋)
 
-cd /app 
 
 python main.py --data_path=./ml-latest/ratings.csv
 ```
-
 
 
 실행방법 (local 환경세팅)
