@@ -3,6 +3,7 @@
 ### AutoEncoder 를 사용하여 Collaborating Filterring을 구현
 
 ### 논문 제목 : AutoRec: Autoencoders Meet Collaborative Filtering
+### 참고자료 : https://github.com/npow/AutoRec  (본 프로젝트는 Sparse matrix와 tensorflow dataset을 이용하여 구현함)
 
 Requirements 
 
@@ -60,3 +61,4 @@ wget http://files.grouplens.org/datasets/movielens/ml-latest.zip (큰 데이터�
 unzip ml-latest.zip
 
 python main.py --data_dir=ml-small-latest ```
+
