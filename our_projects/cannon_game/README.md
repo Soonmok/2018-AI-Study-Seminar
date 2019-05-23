@@ -10,8 +10,13 @@ I took some code snippets of DQN algorithm from `yenchenlin` 's github project
 # Play video
 
 ## 10 minutes later ..
+Scared pablo....
+
+
+<img src="https://media.giphy.com/media/1zkHkOR2BByPHoN3eI/giphy.gif">
 
 ## 1 hour later ..
+
 
 # dependencies 
 ```
