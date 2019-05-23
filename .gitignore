@@ -3,3 +3,5 @@ LearnByCode/DeepLearningFlappyBird/.cache/
 *.swo
 *.swp
 *.h5
+save_networks
+__pycache__
