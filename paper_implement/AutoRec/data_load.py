@@ -1,3 +1,4 @@
+import fire
 import numpy as np 
 import pandas as pd
 import _pickle as pickle
@@ -123,7 +124,7 @@ def sparse_test_generator(sparse_rating, sparse_train, sparse_test):
         test_row : np.array row of test mask
         ex) [0, 1, 0, 0, 1]""" 
 
-    for rating_row, train_row, matrix_row in zip(sparse_rating, sparse_train, sparse_matrix):
+    for rating_row, train_row, test_row in zip(sparse_rating, sparse_train, sparse_test):
         rating_row = np.asarray(rating_row.todense())[0]
         train_row = np.asarray(train_row.todense())[0]
         test_row = np.asarray(test_row.todense())[0]
@@ -146,5 +147,5 @@ def get_test_dataset(sparse_rating, sparse_train, sparse_matrix, batch_size):
 
 
 if __name__=='__main__':
-  data = load_data('dataset/ratings.csv')
-  print(data)
+  fire.Fire(load_data('dataset/ratings.csv'))
+
