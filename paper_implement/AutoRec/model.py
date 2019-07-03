@@ -28,7 +28,7 @@ class AutoEncoder(object):
             activation=tf.nn.sigmoid,
             name="encode1")
         features = tf.layers.dense(
-            inputs=layer_1,
+            inputs=layer_2,
             units=hidden_size,
             activation=tf.nn.sigmoid,
             name="encode2")
